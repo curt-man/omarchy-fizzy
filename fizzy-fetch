@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# fizzy-fetch — curl wrapper for the Fizzy API (app.fizzy.do).
+#
+# The access token is read from the widget's config file and handed to curl
+# via a mode-0600 curl config file, so it never appears on any argv.
+#
+# Usage:
+#   fizzy-fetch [--config PATH] [--paginate] METHOD API_PATH [JSON_BODY]
+#
+#   METHOD    GET | POST | PUT | DELETE
+#   API_PATH  path on the Fizzy host; the literal token {slug} is replaced
+#             with the configured account slug (e.g. "/{slug}/boards")
+#   JSON_BODY optional request body, sent as application/json
+#
+#   --paginate follows rel="next" Link headers, capped at 5 pages (500 items
+#   at Fizzy's page size) to bound worst-case latency in the shell.
+#
+# Exit codes: 0 ok (body on stdout), 3 not configured, 4 auth rejected,
+#             1 any other failure (detail on stderr).
+set -euo pipefail
+
+CONFIG="$HOME/.local/state/omarchy/settings/fizzy.json"
+PAGINATE=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --config) CONFIG="$2"; shift 2 ;;
+    --paginate) PAGINATE=1; shift ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+
+METHOD="${1:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+API_PATH="${2:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+BODY="${3:-}"
+
+case "$METHOD" in
+  GET|POST|PUT|DELETE) ;;
+  *) echo "fizzy-fetch: unsupported method: $METHOD" >&2; exit 1 ;;
+esac
+
+[[ -r "$CONFIG" ]] || { echo "fizzy-fetch: not configured ($CONFIG missing)" >&2; exit 3; }
+
+# A malformed config file counts as "not configured", not a hard error.
+TOKEN=$(jq -r '.token // empty' "$CONFIG" 2>/dev/null) \
+  || { echo "fizzy-fetch: config is not valid JSON" >&2; exit 3; }
+SLUG=$(jq -r '.account_slug // empty' "$CONFIG" 2>/dev/null || true)
+BASE=$(jq -r '.base_url // empty' "$CONFIG" 2>/dev/null || true)
+BASE="${BASE:-https://app.fizzy.do}"
+BASE="${BASE%/}"
+
+[[ -n "$TOKEN" ]] || { echo "fizzy-fetch: no token configured" >&2; exit 3; }
+
+SLUG="${SLUG#/}"
+API_PATH="${API_PATH//\{slug\}/$SLUG}"
+
+CURL_CFG=$(mktemp)   # mktemp creates 0600
+HDR_FILE=$(mktemp)
+BODY_FILE=""
+cleanup() { rm -f "$CURL_CFG" "$HDR_FILE" ${BODY_FILE:+"$BODY_FILE"}; }
+trap cleanup EXIT
+
+printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" > "$CURL_CFG"
+
+if [[ -n "$BODY" ]]; then
+  BODY_FILE=$(mktemp)
+  printf '%s' "$BODY" > "$BODY_FILE"
+fi
+
+fetch_url() { # $1 = absolute url; prints body, returns curl-ish status handling
+  local response status
+  response=$(curl -sS --max-time 15 -X "$METHOD" \
+    -H 'Content-Type: application/json' -H 'Accept: application/json' \
+    -D "$HDR_FILE" -w $'\n%{http_code}' --config "$CURL_CFG" \
+    ${BODY_FILE:+--data @"$BODY_FILE"} \
+    "$1") || { echo "fizzy-fetch: network error" >&2; exit 1; }
+
+  status="${response##*$'\n'}"
+  local body="${response%$'\n'*}"
+  [[ "$body" == "$status" ]] && body=""   # empty-body responses (204)
+
+  case "$status" in
+    2*) printf '%s' "$body"; return 0 ;;
+    401|403) echo "fizzy-fetch: auth rejected (HTTP $status)" >&2; exit 4 ;;
+    *) echo "fizzy-fetch: HTTP $status: $body" >&2; exit 1 ;;
+  esac
+}
+
+next_link() { # reads the last response's headers, prints rel=next url or nothing
+  awk 'tolower($0) ~ /^link:/ {print}' "$HDR_FILE" \
+    | tr ',' '\n' \
+    | grep -i 'rel="next"' \
+    | sed -E 's/.*<([^>]+)>.*/\1/' \
+    | head -1 || true
+}
+
+URL="$BASE$API_PATH"
+
+if [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
+  PAGES=()
+  for _ in 1 2 3 4 5; do
+    PAGES+=("$(fetch_url "$URL")")
+    URL=$(next_link)
+    [[ -n "$URL" ]] || break
+    [[ "$URL" == http* ]] || URL="$BASE$URL"
+  done
+  # List endpoints return top-level JSON arrays; merge them.
+  printf '%s\n' "${PAGES[@]}" | jq -s 'map(if type == "array" then . else [] end) | add'
+else
+  fetch_url "$URL"
+fi

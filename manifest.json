@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "ryanyogan.fizzy",
+  "name": "Fizzy",
+  "version": "1.0.0",
+  "author": "Ryan Yogan",
+  "license": "MIT",
+  "description": "Fizzy (fizzy.do) kanban in your bar — browse boards, triage and move cards, add new ones, all from a mobile-style panel.",
+  "homepage": "https://github.com/ryanyogan/omarchy-fizzy",
+  "repository": "https://github.com/ryanyogan/omarchy-fizzy",
+  "keywords": ["fizzy", "kanban", "37signals", "tasks", "cards"],
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Fizzy",
+    "description": "Fizzy kanban boards and cards",
+    "category": "Productivity",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "refreshIntervalSec": 300,
+      "showBadge": true
+    },
+    "schema": [
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "Background refresh interval for the triage badge (seconds)",
+        "min": 60,
+        "max": 3600,
+        "step": 30,
+        "defaultValue": 300
+      },
+      {
+        "key": "showBadge",
+        "type": "boolean",
+        "label": "Show the triage card count next to the bar icon",
+        "defaultValue": true
+      }
+    ]
+  }
+}
