@@ -450,21 +450,12 @@ Item {
             width: body.width
             spacing: Style.space(9)
 
-            Rectangle {
-              width: Style.space(20)
-              height: width
-              radius: width / 2
-              color: Util.alpha(
-                Model.avatarColor(commentRow.modelData.creator ? commentRow.modelData.creator.name : "", panel.lightTheme),
-                0.35)
-
-              Text {
-                anchors.centerIn: parent
-                text: Model.initials(commentRow.modelData.creator ? commentRow.modelData.creator.name : "")
-                color: panel.ink
-                font.family: panel.fontFamily
-                font.pixelSize: Math.round(Style.font.caption * 0.85)
-              }
+            Avatar {
+              user: commentRow.modelData.creator
+              photoUrl: root.panel.avatarUrlFor(commentRow.modelData.creator)
+              panel: root.panel
+              size: Style.space(20)
+              initialsScale: 0.46
             }
 
             Column {

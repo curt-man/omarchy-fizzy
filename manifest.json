@@ -19,7 +19,11 @@
     "defaultSection": "right",
     "defaults": {
       "refreshIntervalSec": 300,
-      "showBadge": true
+      "showBadge": true,
+      "badgeSource": "maybe",
+      "tintOnTriage": true,
+      "tintTarget": "icon and count",
+      "showAvatars": false
     },
     "schema": [
       {
@@ -36,6 +40,33 @@
         "type": "boolean",
         "label": "Show the triage card count next to the bar icon",
         "defaultValue": true
+      },
+      {
+        "key": "badgeSource",
+        "type": "string",
+        "label": "What the bar count counts",
+        "options": ["maybe", "assigned to me", "in play", "all open"],
+        "defaultValue": "maybe"
+      },
+      {
+        "key": "tintOnTriage",
+        "type": "boolean",
+        "label": "Tint the bar widget while cards wait in Maybe?",
+        "defaultValue": true
+      },
+      {
+        "key": "tintTarget",
+        "type": "string",
+        "label": "What the tint colors",
+        "options": ["icon and count", "count", "icon"],
+        "defaultValue": "icon and count"
+      },
+      {
+        "key": "showAvatars",
+        "type": "boolean",
+        "label": "Show people's Fizzy avatars instead of their initials",
+        "defaultValue": false,
+        "description": "Fetches each avatar from your Fizzy host. Off by default because it means the shell loads remote images."
       }
     ]
   }

@@ -94,6 +94,7 @@ Panel {
     var normalized = Model.normalizeBaseUrl(config && config.base_url ? config.base_url : "")
     return normalized !== "" ? normalized : defaultBaseUrl
   }
+  readonly property string userId: config && config.user_id ? String(config.user_id) : ""
   readonly property string instanceLabel: Model.baseUrlLabel(baseUrl)
   readonly property bool customInstance: baseUrl !== defaultBaseUrl
 
@@ -296,8 +297,29 @@ Panel {
   readonly property var grouped: Model.groupOpenCards(openCards)
   readonly property var filters: Model.buildFilters(columns, grouped, lightTheme)
   readonly property var visibleCards: Model.cardsForFilter(activeFilterKey, grouped, notNowCards, closedCards)
-  readonly property int badgeCount: authed && boardId !== "" ? grouped.maybe.length : 0
   readonly property int inPlayCount: openCards.length - grouped.maybe.length
+  readonly property int assignedToMeCount: {
+    if (userId === "") return 0
+    var mine = 0
+    for (var i = 0; i < openCards.length; i++)
+      if (Model.hasAssignee(openCards[i], userId)) mine++
+    return mine
+  }
+
+  // The bar badge counts one pile, and which pile is a setting. Everything
+  // here is already loaded for the board, so switching source costs no fetch.
+  readonly property int badgeCount: {
+    if (!authed || boardId === "") return 0
+    if (badgeSource === "assigned to me") return assignedToMeCount
+    if (badgeSource === "in play") return inPlayCount
+    if (badgeSource === "all open") return openCards.length
+    return grouped.maybe.length
+  }
+  readonly property string badgeLabel:
+    badgeSource === "assigned to me" ? "assigned to you"
+    : badgeSource === "in play" ? "in play"
+    : badgeSource === "all open" ? "open"
+    : "in Maybe?"
 
   Timer {
     interval: 60000
@@ -316,7 +338,7 @@ Panel {
 
   function pageLevel(name) {
     if (name === "board") return 1
-    if (name === "card" || name === "compose") return 2
+    if (name === "card" || name === "compose" || name === "settings") return 2
     return 0
   }
   readonly property int currentLevel: pageLevel(page)
@@ -351,6 +373,13 @@ Panel {
   // another instance, and then the config is still good: pin it so a refresh
   // can't bounce the page away, and offer the way back.
   property bool authPagePinned: false
+
+  // Pushed, not swapped: Back returns to the board or the boards list, and
+  // the connect page opened from here still has somewhere to go back to.
+  function openSettingsPage() {
+    if (page === "settings") return
+    pushPage("settings")
+  }
 
   function openConnectPage() {
     notice = ""
@@ -417,6 +446,7 @@ Panel {
     if (!hasToken || tokenRejected) { page = "auth"; return }
     if (!authed) { resolveIdentity(); return }
     if (boards.length === 0 || force) loadBoards()
+    if (userId === "" && badgeSource === "assigned to me") resolveUserId()
     if ((page === "auth" && !authPagePinned) || page === "") {
       page = boardId !== "" ? "board" : "boards"
       pageStack = []
@@ -433,7 +463,8 @@ Panel {
         root.notice = "Can't reach " + root.instanceLabel + " — check the address and your connection"
         return
       }
-      var accounts = Model.accountsFromIdentity(Model.parseJson(out, {}))
+      var identity = Model.parseJson(out, {})
+      var accounts = Model.accountsFromIdentity(identity)
       if (accounts.length === 0) {
         root.notice = "No Fizzy accounts found for this token"
         return
@@ -442,9 +473,23 @@ Panel {
         root.notice = ""
         root.refresh(true)
       }
-      root.saveConfig({ account_slug: accounts[0].slug })
+      root.saveConfig({
+        account_slug: accounts[0].slug,
+        user_id: identity.id ? String(identity.id) : null
+      })
     })
   }
+
+  function resolveUserId() {
+    if (identityInFlight) return
+    identityInFlight = true
+    api("GET", "/my/identity", null, false, function(ok, out) {
+      root.identityInFlight = false
+      var identity = Model.parseJson(out, {})
+      if (ok && identity.id) root.saveConfig({ user_id: String(identity.id) })
+    })
+  }
+  property bool identityInFlight: false
 
   function loadBoards() {
     api("GET", "/{slug}/boards", null, true, function(ok, out) {
@@ -485,10 +530,46 @@ Panel {
       api("GET", "/{slug}/users", null, true, function(ok, out) {
         if (ok) root.users = Model.parseArray(out).filter(function(user) { return user.active !== false })
       })
+    resolveAvatars()
     if (tags.length === 0)
       api("GET", "/{slug}/tags", null, true, function(ok, out) {
         if (ok) root.tags = Model.parseArray(out)
       })
+  }
+
+  // Which people have a real picture. Fizzy answers its avatar endpoint with
+  // an SVG it renders itself for everyone else, and Qt's SVG renderer draws
+  // that file as a smear in one corner — so the helper probes each avatar's
+  // content type once and the rest keep the initials disc drawn here.
+  property var avatarUrls: ({})
+  property bool avatarsResolved: false
+
+  function resolveAvatars() {
+    if (!showAvatars || avatarsResolved || avatarProc.running || !authed) return
+    avatarProc.running = true
+  }
+
+  function avatarUrlFor(person) {
+    if (!showAvatars || !person || !person.id) return ""
+    return avatarUrls[String(person.id)] || ""
+  }
+
+  onShowAvatarsChanged: {
+    avatarsResolved = false
+    avatarUrls = ({})
+    if (showAvatars) Qt.callLater(resolveAvatars)
+  }
+
+  Process {
+    id: avatarProc
+    running: false
+    command: [root.helperPath, "--avatars"]
+    stdout: StdioCollector { waitForEnd: true }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) return
+      root.avatarUrls = Model.parseJson(stdout.text, {})
+      root.avatarsResolved = true
+    }
   }
 
   function loadNotNow() {
@@ -766,12 +847,37 @@ Panel {
     closedCards = []
     users = []
     tags = []
+    avatarUrls = ({})
+    avatarsResolved = false
     lastCardsJson = ""
     cardDetail = null
     cardComments = []
     activeFilterKey = "maybe"
     cardCursor = -1
     boardCursor = 0
+  }
+
+  // ---------------------------------------------------------------- settings
+
+  // The settings page edits these; the bar widget reads the same keys. Both
+  // sides go through the shell's settings store, so a change from the panel,
+  // from `omarchy bar set`, or from the shell's own settings UI is one change.
+  readonly property bool showBadge: setting("showBadge", true) === true
+  readonly property string badgeSource: String(setting("badgeSource", "maybe"))
+  readonly property bool tintOnTriage: setting("tintOnTriage", true) !== false
+  readonly property string tintTarget: String(setting("tintTarget", "icon and count"))
+
+  // Opt-in: on, people are drawn with their Fizzy avatar instead of locally
+  // rendered initials, which means the shell loads images from the instance.
+  readonly property bool showAvatars: setting("showAvatars", false) === true
+
+  // Writes go through omarchy-bar rather than straight to shell.json: it owns
+  // the file, validates the value, and the hot-reload comes back to us as a
+  // fresh `settings` object. `value` is JSON, so strings arrive quoted.
+  function setSetting(key, value) {
+    Util.execDetached("omarchy-bar set " + Util.shellQuote(moduleName)
+      + " " + Util.shellQuote(key)
+      + " " + Util.shellQuote(JSON.stringify(value)) + " --json")
   }
 
   // Background poll keeps the bar badge honest while the panel is closed.
@@ -803,6 +909,7 @@ Panel {
 
   readonly property string heroTitle:
     page === "auth" ? "Fizzy"
+    : page === "settings" ? "Settings"
     : page === "boards" ? "Fizzy"
     : page === "board" ? (boardName || "Board")
     : page === "card" ? (cardDetail ? "#" + cardDetail.number : "Card")
@@ -810,6 +917,7 @@ Panel {
 
   readonly property string heroMeta:
     page === "auth" ? (authPagePinned ? "Switch instance" : "Connect your account")
+    : page === "settings" ? instanceLabel
     : offline ? "Offline — press r to retry"
     : page === "boards" ? ((boards.length > 0 ? boards.length + " boards" : "Your boards")
         + (customInstance ? " · " + instanceLabel : ""))
@@ -848,7 +956,7 @@ Panel {
         root.clearPendingVimKey()
         if (root.helpVisible) root.helpVisible = false
         else if (root.page === "auth" && root.authPagePinned) root.leaveConnectPage()
-        else if (root.page === "card" || root.page === "compose") root.popPage()
+        else if (root.page === "card" || root.page === "compose" || root.page === "settings") root.popPage()
         else if (root.page === "boards" && root.boardId !== "") root.page = "board"
         else root.close()
       }
@@ -890,6 +998,8 @@ Panel {
         }
         if (t === "G") { root.jumpToEdge(1); return }
         if (t === "r" || t === "R") { root.refresh(true); return }
+        // "," is the settings key everywhere else; the gear is the same door.
+        if (t === "," && root.page !== "auth") { root.openSettingsPage(); return }
         if ((t === "n" || t === "N" || t === "c" || t === "C") && root.page === "board") { root.openCompose(""); return }
         if (t === "o" || t === "O") {
           if (root.page === "board" && root.cardCursor >= 0 && root.cardCursor < root.visibleCards.length)
@@ -989,10 +1099,10 @@ Panel {
               }
 
               PanelActionButton {
-                iconText: "󰒋"
-                tooltipText: "Connected to " + heroItem.fizzy.instanceLabel + " — switch instance or token"
+                iconText: "󰒓"
+                tooltipText: "Settings — instance, badge, avatars"
                 foreground: heroItem.fizzy.dim
-                onClicked: heroItem.fizzy.openConnectPage()
+                onClicked: heroItem.fizzy.openSettingsPage()
               }
             }
           }
@@ -1021,6 +1131,13 @@ Panel {
                 tooltipText: "All boards"
                 foreground: heroItem.fizzy.dim
                 onClicked: { heroItem.fizzy.page = "boards"; heroItem.fizzy.loadBoards() }
+              }
+
+              PanelActionButton {
+                iconText: "󰒓"
+                tooltipText: "Settings — instance, badge, avatars"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.openSettingsPage()
               }
 
               PanelActionButton {
@@ -1065,7 +1182,8 @@ Panel {
             Item { id: inner; anchors.fill: parent }
           }
 
-          PageSlot { name: "auth";   AuthPage   { id: authPageItem; anchors.fill: parent; panel: root } }
+          PageSlot { name: "auth";     AuthPage     { id: authPageItem; anchors.fill: parent; panel: root } }
+          PageSlot { name: "settings"; SettingsPage { id: settingsPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "boards"; BoardsPage { id: boardsPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "board";  BoardPage  { id: boardPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "card";   CardPage   { id: cardPageItem; anchors.fill: parent; panel: root } }
@@ -1183,6 +1301,7 @@ Panel {
           HelpRow { keys: "s"; does: "Toggle golden" }
           HelpRow { keys: "1 – 9"; does: "Jump to filter" }
           HelpRow { keys: "r"; does: "Refresh" }
+          HelpRow { keys: ","; does: "Settings" }
           HelpRow { keys: "Tab"; does: "Next bar panel" }
           HelpRow { keys: "Esc"; does: "Back · close" }
           HelpRow { keys: "?"; does: "This help" }

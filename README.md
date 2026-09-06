@@ -38,6 +38,7 @@
 | <kbd>s</kbd> | Toggle golden |
 | <kbd>1</kbd>…<kbd>9</kbd> | Jump straight to a filter |
 | <kbd>r</kbd> | Refresh |
+| <kbd>,</kbd> | Settings |
 | <kbd>Tab</kbd> | Next bar panel |
 | <kbd>Esc</kbd> | Back, then close |
 | <kbd>?</kbd> | The cheat sheet |
@@ -91,14 +92,27 @@ Everything else — boards, cards, badge, shortcuts — works the same.
 
 ## Settings
 
-Via `omarchy bar set` or the shell settings UI:
+Press <kbd>,</kbd> or the ⚙ in the panel header. Everything below is on that
+page; it writes the same keys as `omarchy bar set` and the shell settings UI,
+so the three never disagree.
 
 | Key | Default | Meaning |
 | :--- | ---: | :--- |
 | `refreshIntervalSec` | `300` | Background poll for the bar badge |
-| `showBadge` | `true` | Show the Maybe? count next to the icon |
+| `showBadge` | `true` | Show the count next to the icon |
+| `badgeSource` | `maybe` | What the count counts — `maybe`, `assigned to me`, `in play`, or `all open` |
+| `tintOnTriage` | `true` | Tint the widget while cards are waiting, using the bar's own active color |
+| `tintTarget` | `icon and count` | What the tint colors — `icon and count`, `count`, or `icon` |
+| `showAvatars` | `false` | Draw people with their Fizzy picture instead of locally rendered initials |
 
 Mouse extras on the bar icon: left click opens the panel, middle click refreshes, right click toggles the count badge.
+
+> [!NOTE]
+> `showAvatars` is off by default because it is the one setting that makes the
+> shell fetch something it otherwise never would: people's pictures, from your
+> Fizzy host. Comment HTML is scrubbed of remote images for the same reason.
+> Only real uploaded pictures are ever loaded — Fizzy draws an SVG for everyone
+> else, which Qt cannot render, and the local initials disc is better anyway.
 
 ## Themes
 

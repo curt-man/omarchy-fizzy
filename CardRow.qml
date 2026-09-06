@@ -103,22 +103,17 @@ CursorSurface {
 
     Repeater {
       model: root.mates.slice(0, 3)
-      delegate: Rectangle {
+      delegate: Avatar {
         required property var modelData
-        width: Style.space(16)
-        height: width
-        radius: width / 2
-        color: Util.alpha(Model.avatarColor(modelData.name, root.panel.lightTheme), 0.35)
-        border.width: 1
-        border.color: Color.popups ? Color.popups.background : Color.background
-
-        Text {
-          anchors.centerIn: parent
-          text: Model.initials(modelData.name)
-          color: root.panel.ink
-          font.family: root.panel.fontFamily
-          font.pixelSize: Math.round(Style.font.caption * 0.8)
-        }
+        user: modelData
+        photoUrl: root.panel.avatarUrlFor(modelData)
+        panel: root.panel
+        size: Style.space(16)
+        initialsScale: 0.5
+        // The stack overlaps by design; the ring is what keeps three seats
+        // legible as three.
+        borderWidth: 1
+        borderColor: Color.popups ? Color.popups.background : Color.background
       }
     }
   }

@@ -18,25 +18,41 @@
 #   --paginate follows rel="next" Link headers, capped at 5 pages (500 items
 #   at Fizzy's page size) to bound worst-case latency in the shell.
 #
+#   --avatars takes no METHOD or API_PATH. It reads the account's people and
+#   writes {"<user id>": "<direct image url>"} for everyone who has a real
+#   picture. Fizzy answers its avatar endpoint with an SVG it renders itself
+#   for anyone who never uploaded one, and Qt's SVG renderer cannot draw that
+#   file — percentage geometry collapses into one corner — so the panel must
+#   know which avatars are raster images before it tries to show any.
+#
 # Exit codes: 0 ok (body on stdout), 3 not configured, 4 auth rejected,
 #             1 any other failure (detail on stderr).
 set -euo pipefail
 
 CONFIG="$HOME/.local/state/omarchy/settings/fizzy.json"
 PAGINATE=0
+AVATARS=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
     --paginate) PAGINATE=1; shift ;;
+    --avatars) AVATARS=1; shift ;;
     --) shift; break ;;
     *) break ;;
   esac
 done
 
-METHOD="${1:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
-API_PATH="${2:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
-BODY="${3:-}"
+if [[ "$AVATARS" == "1" ]]; then
+  METHOD="GET"
+  API_PATH="/{slug}/users"
+  BODY=""
+  PAGINATE=1
+else
+  METHOD="${1:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+  API_PATH="${2:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+  BODY="${3:-}"
+fi
 
 case "$METHOD" in
   GET|POST|PUT|DELETE) ;;
@@ -118,7 +134,47 @@ next_link() { # reads the last response's headers, prints rel=next url or nothin
 
 URL="$BASE$API_PATH"
 
-if [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
+# Which people have a real picture. One HEAD each, eight at a time: the answer
+# is stable for a session, so this runs once and the panel keeps the map.
+resolve_avatars() {
+  local users="$1" work id url type inflight=0
+  work=$(mktemp -d)
+  trap 'rm -rf "$work"' RETURN
+
+  while IFS=$'\t' read -r id url; do
+    [[ -n "$id" && -n "$url" ]] || continue
+    (
+      # The value is the avatar endpoint, not the storage URL it redirects to:
+      # that one is signed and expires, and Qt follows the redirect itself, so
+      # keeping the stable address means the picture never goes stale.
+      type=$(curl -sIL -o /dev/null --max-time 10 --config "$CURL_CFG" \
+        -w '%{content_type}' "$url" 2>/dev/null) || exit 0
+      case "$type" in
+        image/svg*) exit 0 ;;                      # server-drawn initials
+        image/*) printf '%s\t%s\n' "$id" "$url" > "$work/${id//[^A-Za-z0-9_-]/_}" ;;
+      esac
+    ) &
+    inflight=$((inflight + 1))
+    (( inflight % 8 == 0 )) && wait
+  done < <(printf '%s' "$users" | jq -r '.[]? | select(.avatar_url) | "\(.id)\t\(.avatar_url)"')
+  wait
+
+  cat "$work"/* 2>/dev/null | jq -R -s '
+    split("\n") | map(select(length > 0) | split("\t"))
+    | map({ key: .[0], value: .[1] }) | from_entries'
+}
+
+if [[ "$AVATARS" == "1" ]]; then
+  PAGES=()
+  for _ in 1 2 3 4 5; do
+    PAGES+=("$(fetch_url "$URL")")
+    URL=$(next_link)
+    [[ -n "$URL" ]] || break
+    [[ "$URL" == http* ]] || URL="$ORIGIN${URL#/}"
+  done
+  resolve_avatars "$(printf '%s\n' "${PAGES[@]}" \
+    | jq -s 'map(if type == "array" then . else [] end) | add')"
+elif [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
   PAGES=()
   for _ in 1 2 3 4 5; do
     PAGES+=("$(fetch_url "$URL")")
