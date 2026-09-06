@@ -18,6 +18,7 @@
 - ✍️ **Two ways to capture.** Quick-add files straight to Maybe? from the board. The full composer adds notes, a destination column, tags, and people in one screen.
 - ⌨️ **Vim at heart.** Every action is reachable from the home row. Press <kbd>?</kbd> for the cheat sheet.
 - 🎨 **Native in every theme.** All colors come from Omarchy's theme tokens, with light and dark variants of Fizzy's own card palette.
+- 🏠 **Your Fizzy, wherever it lives.** app.fizzy.do, your company's instance, or localhost — the address is part of connecting.
 
 <p align="center">
   <img src="assets/card.png" alt="The card page: mover chips for every column, notes, a steps progress meter, people, and tags" width="420">
@@ -51,12 +52,42 @@ Then add the Fizzy widget to your bar from the bar settings if it does not appea
 
 ## Connect your account
 
-Open the widget and paste a personal access token. Get one in Fizzy under **Settings → API Tokens** (create it with read + write).
+Open the widget, enter the address of your Fizzy — `app.fizzy.do`, or your own instance — and paste a personal access token. Get one in Fizzy under **Settings → API Tokens** (create it with read + write).
 
 > [!NOTE]
 > The token is stored in `~/.local/state/omarchy/settings/fizzy.json` with mode `0600` and is handed to `curl` through a private config file. It never appears on a process command line.
 
 Your account is detected automatically. Pick a board and you are in business.
+
+## Custom and self-hosted instances
+
+The connect screen's **Fizzy address** field takes whatever you have:
+
+| You type | It talks to |
+| :--- | :--- |
+| `fizzy.example.com` | `https://fizzy.example.com` |
+| `https://fizzy.example.com/` | `https://fizzy.example.com` |
+| `fizzy.example.com:3000` | `https://fizzy.example.com:3000` |
+| `example.com/fizzy` | `https://example.com/fizzy` |
+| `localhost:3000` | `http://localhost:3000` |
+
+`https://` is assumed unless you type `http://` yourself; loopback addresses
+(`localhost`, `127.0.0.1`, `[::1]`) default to `http://` because a dev
+instance does not speak TLS. Leave the field empty for `app.fizzy.do`.
+
+To move to another instance later, open the boards list and press 󰒋 in the
+header. Tokens belong to one host, so you paste a fresh one — the old token is
+never sent to the new instance. The selected board is cleared on a move,
+because board ids belong to the host you left.
+
+The address is stored as `base_url` in
+`~/.local/state/omarchy/settings/fizzy.json` and can be set there directly:
+
+```json
+{ "base_url": "https://fizzy.example.com" }
+```
+
+Everything else — boards, cards, badge, shortcuts — works the same.
 
 ## Settings
 
@@ -76,20 +107,6 @@ The panel is drawn entirely with Omarchy theme tokens, so it follows whatever th
 | Tokyo Night | Catppuccin Latte | Solitude |
 | :---: | :---: | :---: |
 | ![Tokyo Night](assets/theme-tokyo-night.png) | ![Catppuccin Latte](assets/theme-latte.png) | ![Solitude](assets/theme-solitude.png) |
-
-<details>
-<summary>Self-hosted Fizzy</summary>
-
-Point the plugin at your own instance by setting `base_url` in
-`~/.local/state/omarchy/settings/fizzy.json`:
-
-```json
-{ "base_url": "https://fizzy.example.com" }
-```
-
-Everything else works the same.
-
-</details>
 
 ## Requirements
 

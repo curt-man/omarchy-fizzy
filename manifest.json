@@ -5,10 +5,10 @@
   "version": "1.0.0",
   "author": "Ryan Yogan",
   "license": "MIT",
-  "description": "Fizzy (fizzy.do) kanban in your bar — browse boards, triage and move cards, add new ones, all from a mobile-style panel.",
+  "description": "Fizzy kanban in your bar — browse boards, triage and move cards, add new ones, all from a mobile-style panel. Works with app.fizzy.do or your own instance.",
   "homepage": "https://github.com/ryanyogan/omarchy-fizzy",
   "repository": "https://github.com/ryanyogan/omarchy-fizzy",
-  "keywords": ["fizzy", "kanban", "37signals", "tasks", "cards"],
+  "keywords": ["fizzy", "kanban", "37signals", "tasks", "cards", "self-hosted"],
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "BarWidget.qml" },
   "barWidget": {

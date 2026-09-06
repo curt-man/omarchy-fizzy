@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# fizzy-fetch — curl wrapper for the Fizzy API (app.fizzy.do).
+# fizzy-fetch — curl wrapper for the Fizzy API.
+#
+# The host comes from base_url in the config file, so this talks to any Fizzy
+# instance; app.fizzy.do is only the default.
 #
 # The access token is read from the widget's config file and handed to curl
 # via a mode-0600 curl config file, so it never appears on any argv.
@@ -8,7 +11,7 @@
 #   fizzy-fetch [--config PATH] [--paginate] METHOD API_PATH [JSON_BODY]
 #
 #   METHOD    GET | POST | PUT | DELETE
-#   API_PATH  path on the Fizzy host; the literal token {slug} is replaced
+#   API_PATH  path on the configured host; the literal token {slug} is replaced
 #             with the configured account slug (e.g. "/{slug}/boards")
 #   JSON_BODY optional request body, sent as application/json
 #
@@ -48,7 +51,25 @@ TOKEN=$(jq -r '.token // empty' "$CONFIG" 2>/dev/null) \
 SLUG=$(jq -r '.account_slug // empty' "$CONFIG" 2>/dev/null || true)
 BASE=$(jq -r '.base_url // empty' "$CONFIG" 2>/dev/null || true)
 BASE="${BASE:-https://app.fizzy.do}"
-BASE="${BASE%/}"
+
+# base_url is user-typed (the connect screen, or this file edited by hand), so
+# a bare host is the likely paste: https for a real one, http for a loopback
+# dev instance, which does not speak TLS. Anything that isn't http(s) is a
+# mistake worth naming rather than handing to curl. Keep this rule in step
+# with normalizeBaseUrl in Model.js.
+case "$BASE" in
+  http://*|https://*) ;;
+  *://*) echo "fizzy-fetch: base_url must be http:// or https:// (got $BASE)" >&2; exit 3 ;;
+  localhost|localhost:*|localhost/*|127.*|\[::1\]|\[::1\]:*) BASE="http://$BASE" ;;
+  *) BASE="https://$BASE" ;;
+esac
+while [[ "$BASE" == */ ]]; do BASE="${BASE%/}"; done
+
+# Link headers give paths from the site root, so a relative rel="next" has to
+# resolve against the origin — not against an instance served under a prefix.
+SCHEME="${BASE%%://*}"
+HOST_AND_PATH="${BASE#*://}"
+ORIGIN="$SCHEME://${HOST_AND_PATH%%/*}/"
 
 [[ -n "$TOKEN" ]] || { echo "fizzy-fetch: no token configured" >&2; exit 3; }
 
@@ -103,7 +124,7 @@ if [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
     PAGES+=("$(fetch_url "$URL")")
     URL=$(next_link)
     [[ -n "$URL" ]] || break
-    [[ "$URL" == http* ]] || URL="$BASE$URL"
+    [[ "$URL" == http* ]] || URL="$ORIGIN${URL#/}"
   done
   # List endpoints return top-level JSON arrays; merge them.
   printf '%s\n' "${PAGES[@]}" | jq -s 'map(if type == "array" then . else [] end) | add'

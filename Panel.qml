@@ -86,6 +86,17 @@ Panel {
     return ""
   }
 
+  // Fizzy self-hosts, so the host is config, not a constant. Normalized on
+  // read as well as on write: the config file is hand-editable, and a bad
+  // base_url there would otherwise reach curl on every request.
+  readonly property string defaultBaseUrl: Model.defaultBaseUrl()
+  readonly property string baseUrl: {
+    var normalized = Model.normalizeBaseUrl(config && config.base_url ? config.base_url : "")
+    return normalized !== "" ? normalized : defaultBaseUrl
+  }
+  readonly property string instanceLabel: Model.baseUrlLabel(baseUrl)
+  readonly property bool customInstance: baseUrl !== defaultBaseUrl
+
   onConfigLoadedChanged: if (configLoaded) Qt.callLater(function() { root.refresh(false) })
 
   property FileView configFile: FileView {
@@ -211,6 +222,7 @@ Panel {
     if (request.callback) request.callback(exitCode === 0, stdoutText, exitCode, stderrText)
     if (exitCode === 4) {
       root.tokenRejected = true
+      root.authPagePinned = false
       root.notice = "Fizzy rejected the token — paste a new one"
       root.page = "auth"
     }
@@ -335,6 +347,26 @@ Panel {
 
   function focusKeys() { keyCatcher.forceActiveFocus() }
 
+  // The auth page normally means "not connected". It is also how you move to
+  // another instance, and then the config is still good: pin it so a refresh
+  // can't bounce the page away, and offer the way back.
+  property bool authPagePinned: false
+
+  function openConnectPage() {
+    notice = ""
+    authPagePinned = authed
+    page = "auth"
+    pageStack = []
+  }
+
+  function leaveConnectPage() {
+    authPagePinned = false
+    notice = ""
+    page = boardId !== "" ? "board" : "boards"
+    pageStack = []
+    Qt.callLater(focusKeys)
+  }
+
   // Vim pending-key state: `g` waits briefly for a second `g`. Any other
   // interaction cancels it, so `g` `j` `g` can't be misread as `gg`.
   property string pendingVimKey: ""
@@ -385,7 +417,7 @@ Panel {
     if (!hasToken || tokenRejected) { page = "auth"; return }
     if (!authed) { resolveIdentity(); return }
     if (boards.length === 0 || force) loadBoards()
-    if (page === "auth" || page === "") {
+    if ((page === "auth" && !authPagePinned) || page === "") {
       page = boardId !== "" ? "board" : "boards"
       pageStack = []
       Qt.callLater(focusKeys)
@@ -398,7 +430,7 @@ Panel {
     api("GET", "/my/identity", null, false, function(ok, out) {
       if (!ok) {
         // Leaving "Connecting…" up forever would read as a hang.
-        root.notice = "Can't reach Fizzy — check your connection and try again"
+        root.notice = "Can't reach " + root.instanceLabel + " — check the address and your connection"
         return
       }
       var accounts = Model.accountsFromIdentity(Model.parseJson(out, {}))
@@ -703,13 +735,43 @@ Panel {
 
   // ---------------------------------------------------------------- auth
 
-  function connectWithToken(token) {
+  function connectWithToken(token, instance) {
     var trimmed = String(token || "").trim()
     if (trimmed === "") { notice = "Paste a token first"; return }
+    var address = Model.normalizeBaseUrl(instance)
+    if (address === "") { notice = "That address doesn't look like a Fizzy instance"; return }
+
+    var moved = address !== baseUrl
     tokenRejected = false
+    authPagePinned = false
     notice = "Connecting…"
     afterSave = function() { root.resolveIdentity() }
-    saveConfig({ token: trimmed, base_url: config.base_url || "https://app.fizzy.do", account_slug: null })
+
+    var values = { token: trimmed, base_url: address, account_slug: null }
+    // Boards, cards and users are all ids on the old host. Carrying them to
+    // a new one would show another server's numbers until the first reload.
+    if (moved) {
+      values.board_id = null
+      forgetInstance()
+    }
+    saveConfig(values)
+  }
+
+  // Everything fetched from the instance we are leaving.
+  function forgetInstance() {
+    boards = []
+    columns = []
+    openCards = []
+    notNowCards = []
+    closedCards = []
+    users = []
+    tags = []
+    lastCardsJson = ""
+    cardDetail = null
+    cardComments = []
+    activeFilterKey = "maybe"
+    cardCursor = -1
+    boardCursor = 0
   }
 
   // Background poll keeps the bar badge honest while the panel is closed.
@@ -747,9 +809,10 @@ Panel {
     : "New card"
 
   readonly property string heroMeta:
-    page === "auth" ? "Connect your account"
+    page === "auth" ? (authPagePinned ? "Switch instance" : "Connect your account")
     : offline ? "Offline — press r to retry"
-    : page === "boards" ? (boards.length > 0 ? boards.length + " boards" : "Your boards")
+    : page === "boards" ? ((boards.length > 0 ? boards.length + " boards" : "Your boards")
+        + (customInstance ? " · " + instanceLabel : ""))
     : page === "board" ? (grouped.maybe.length + " maybe · " + inPlayCount + " in play")
     : page === "card" ? ((boardName || "") + (cardDetail ? " · " + Model.relativeTime(cardDetail.last_active_at, nowTick) : ""))
     : (boardName || "")
@@ -784,6 +847,7 @@ Panel {
       onCloseRequested: {
         root.clearPendingVimKey()
         if (root.helpVisible) root.helpVisible = false
+        else if (root.page === "auth" && root.authPagePinned) root.leaveConnectPage()
         else if (root.page === "card" || root.page === "compose") root.popPage()
         else if (root.page === "boards" && root.boardId !== "") root.page = "board"
         else root.close()
@@ -914,11 +978,22 @@ Panel {
 
           Component {
             id: refreshAction
-            PanelActionButton {
-              iconText: "󰑐"
-              tooltipText: "Refresh"
-              foreground: heroItem.fizzy.dim
-              onClicked: heroItem.fizzy.refresh(true)
+            Row {
+              spacing: Style.space(2)
+
+              PanelActionButton {
+                iconText: "󰑐"
+                tooltipText: "Refresh"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.refresh(true)
+              }
+
+              PanelActionButton {
+                iconText: "󰒋"
+                tooltipText: "Connected to " + heroItem.fizzy.instanceLabel + " — switch instance or token"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.openConnectPage()
+              }
             }
           }
 
