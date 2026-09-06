@@ -451,15 +451,19 @@ Item {
             spacing: Style.space(9)
 
             Avatar {
+              id: commentSeat
               user: commentRow.modelData.creator
               photoUrl: root.panel.avatarUrlFor(commentRow.modelData.creator)
               panel: root.panel
-              size: Style.space(20)
-              initialsScale: 0.46
+              size: Style.space(24)
+              initialsScale: 0.44
             }
 
             Column {
-              width: parent.width - Style.space(29)
+              // Derived, not a hand-added constant: the seat and the gap are
+              // both scaled tokens, so a hard number goes wrong on any theme
+              // that isn't 1.0.
+              width: parent.width - commentSeat.width - commentRow.spacing
               spacing: Style.space(2)
 
               Row {

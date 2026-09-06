@@ -198,7 +198,11 @@ function commentHtml(comment) {
 }
 
 function tagTitle(tag) {
-  return typeof tag === "object" ? (tag.title || "") : String(tag || "");
+  // typeof null is "object", so the guard has to be the value and not its
+  // type: one null in a tags array would otherwise throw inside a binding,
+  // and a binding that throws leaves the row it was drawing blank.
+  if (tag && typeof tag === "object") return tag.title || "";
+  return String(tag || "");
 }
 
 function hasAssignee(card, userId) {
@@ -235,4 +239,14 @@ function accountsFromIdentity(identity) {
     }
   }
   return accounts;
+}
+
+// Resolve a tintColor setting to one of the theme's own colors. The caller
+// passes the three candidates because Color and the bar are QML objects this
+// file cannot see; what belongs here is the mapping, so the panel and the bar
+// widget can't drift apart on what "accent" means.
+function themeColor(name, barActive, accent, urgent) {
+  if (name === "accent") return accent;
+  if (name === "urgent") return urgent;
+  return barActive;
 }

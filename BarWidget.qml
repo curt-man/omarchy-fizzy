@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
+import "Model.js" as Model
 
 BarWidget {
   id: root
@@ -54,6 +55,20 @@ BarWidget {
   readonly property bool tintIcon: triageWaiting && tintTarget !== "count"
   readonly property bool tintCount: triageWaiting && tintTarget !== "icon"
 
+  // Which mark sits in the bar. "bubbles" is this plugin's own drawing and
+  // tints like every other bar glyph; the logo options are Fizzy's real icon,
+  // and "logo in color" keeps its own gradients — which means the triage tint
+  // then has only the count left to color.
+  // Same setting the panel reads, resolved the same way, so the mark in the
+  // bar and the panel it opens are one color.
+  readonly property string tintColor: String(setting("tintColor", "bar active"))
+  readonly property color tintPaint: Model.themeColor(
+    tintColor, root.bar ? root.bar.urgent : Color.urgent, Color.accent, Color.urgent)
+
+  readonly property string barIcon: String(setting("barIcon", "bubbles"))
+  readonly property bool brandIcon: barIcon === "logo in color"
+  readonly property string iconMark: barIcon === "bubbles" ? "bubbles" : "logo"
+
   // Right-click persists the toggle through the bar CLI; shell.json
   // hot-reloads, so the count cell animates open or closed in place.
   // Util.execDetached wants a single shell string, not an argv array.
@@ -86,12 +101,17 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
+    // WidgetButton defaults this to the bar's active color; the setting can
+    // point it at another of the theme's tokens instead.
+    activeColor: root.tintPaint
     // The mark is the plugin's own FizzyIcon (no font dependence); the
     // count cell beside it animates independently inside a reserved slot.
     text: ""
     labelVisible: false
     hasVisualContent: true
-    active: root.triageWaiting && root.tintTarget === "icon and count"
+    // A brand-colored mark can't carry the tint, so the pill would be the only
+    // thing reacting: leave it to the count in that mode.
+    active: root.triageWaiting && root.tintTarget === "icon and count" && !root.brandIcon
     fixedWidth: root.vertical ? -1
       : Math.round(content.implicitWidth + Style.spaceReal(8.5) * 2)
     readonly property string badgeLabel:
@@ -121,6 +141,8 @@ BarWidget {
       FizzyIcon {
         anchors.verticalCenter: parent.verticalCenter
         iconSize: Style.bar.iconCanvas
+        mark: root.iconMark
+        brand: root.brandIcon
         tint: root.tintIcon ? button.activeColor : button.foreground
         animate: false
 

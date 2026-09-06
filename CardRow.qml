@@ -16,6 +16,20 @@ CursorSurface {
 
   readonly property var mates: (card && card.assignees) ? card.assignees : []
 
+  // A card can carry any number of people. Three seats is what the row has
+  // width for next to a two-line title, so the rest become a count: dropping
+  // them silently would make a crowded card look like a quiet one.
+  //
+  // Fizzy truncates the list itself on a busy card and says so in
+  // has_more_assignees — so a number would be a guess there, and the seat says
+  // "more" instead of inventing one.
+  readonly property int seatLimit: 3
+  readonly property bool moreThanListed: card && card.has_more_assignees === true
+  readonly property int overflow: Math.max(0, mates.length - seatLimit)
+  readonly property bool showOverflow: overflow > 0 || moreThanListed
+  readonly property string overflowLabel: moreThanListed ? "…" : "+" + overflow
+  readonly property real seatSize: Style.space(20)
+
   hasCursor: panel && panel.page === "board" && panel.cardCursor === rowIndex
   foreground: panel ? panel.ink : Color.foreground
   accent: panel ? panel.accent : Color.accent
@@ -99,21 +113,41 @@ CursorSurface {
     anchors.right: parent.right
     anchors.rightMargin: Style.space(10)
     anchors.verticalCenter: parent.verticalCenter
-    spacing: -Style.space(4)
+    spacing: -Style.space(5)
 
     Repeater {
-      model: root.mates.slice(0, 3)
+      model: root.mates.slice(0, root.seatLimit)
       delegate: Avatar {
         required property var modelData
         user: modelData
         photoUrl: root.panel.avatarUrlFor(modelData)
         panel: root.panel
-        size: Style.space(16)
-        initialsScale: 0.5
+        size: root.seatSize
+        initialsScale: 0.44
         // The stack overlaps by design; the ring is what keeps three seats
         // legible as three.
         borderWidth: 1
         borderColor: Color.popups ? Color.popups.background : Color.background
+      }
+    }
+
+    // Same disc, same ring, so the count reads as one more seat rather than
+    // as a label that wandered into the stack.
+    Rectangle {
+      visible: root.showOverflow
+      width: root.seatSize
+      height: root.seatSize
+      radius: width / 2
+      color: Style.normalFillFor(root.panel.ink, root.panel.accent)
+      border.width: 1
+      border.color: Color.popups ? Color.popups.background : Color.background
+
+      Text {
+        anchors.centerIn: parent
+        text: root.overflowLabel
+        color: root.panel.dim
+        font.family: root.panel.fontFamily
+        font.pixelSize: Math.round(root.seatSize * 0.44)
       }
     }
   }

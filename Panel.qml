@@ -62,7 +62,17 @@ Panel {
   readonly property bool lightTheme:
     0.2126 * Color.background.r + 0.7152 * Color.background.g + 0.0722 * Color.background.b > 0.5
   readonly property color ink: root.bar ? root.bar.foreground : Color.foreground
-  readonly property color accent: Color.accent
+  // One color for the whole plugin — the panel's accent and the bar's tint are
+  // the same answer, so the widget and the panel it opens never disagree about
+  // what this plugin's color is.
+  //
+  // The choice is between the theme's own tokens, never a hex value: a bar
+  // holding a color the theme didn't choose is the thing themes exist to
+  // prevent. The default is the bar's active color, which is what unread mail
+  // and messages already use up there.
+  readonly property string tintColor: String(setting("tintColor", "bar active"))
+  readonly property color accent: Model.themeColor(
+    tintColor, root.bar ? root.bar.urgent : Color.urgent, Color.accent, Color.urgent)
   readonly property color urgent: root.bar ? root.bar.urgent : Color.urgent
   readonly property color dim: Qt.darker(ink, 1.5)
   readonly property color hairline: Util.alpha(ink, 0.12)
@@ -78,7 +88,12 @@ Panel {
   property var config: ({})
   property bool configLoaded: false
   readonly property bool hasToken: !!(config && config.token)
-  readonly property bool authed: hasToken && !!(config && config.account_slug)
+  // The development harness sets this; nothing in the shell does. On, every
+  // request goes to the helper's --demo fixtures instead of to a server, so
+  // the window can be driven and photographed with no account behind it.
+  property bool demo: false
+
+  readonly property bool authed: demo || (hasToken && !!(config && config.account_slug))
   readonly property string boardId: config && config.board_id ? String(config.board_id) : ""
   readonly property string boardName: {
     for (var i = 0; i < boards.length; i++)
@@ -104,12 +119,17 @@ Panel {
     path: root.configPath
     watchChanges: true
     printErrors: false
-    onFileChanged: reload()
+    // Demo runs have their own config and never read or write yours — the
+    // harness would otherwise open on whatever account this machine is
+    // connected to, which is the one thing a screenshot must never show.
+    onFileChanged: if (!root.demo) reload()
     onLoaded: {
+      if (root.demo) return
       root.config = Model.parseJson(text(), {})
       root.configLoaded = true
     }
     onLoadFailed: {
+      if (root.demo) return
       root.config = ({})
       root.configLoaded = true
     }
@@ -139,6 +159,19 @@ Panel {
   }
 
   function saveConfig(values) {
+    // A demo keeps its config in memory: the fixtures already answer as if the
+    // account existed, and writing would put demo values in a real file.
+    if (demo) {
+      var merged = ({})
+      for (var have in config) merged[have] = config[have]
+      for (var name in values) {
+        if (values[name] === null) delete merged[name]
+        else merged[name] = values[name]
+      }
+      config = merged
+      onConfigSaved()
+      return
+    }
     // Base on pendingConfig when a save is already in flight, so back-to-back
     // saves can't rebuild from stale state and drop the first save's keys.
     var base = pendingConfig || config
@@ -245,6 +278,7 @@ Panel {
       request = req
       root.apiActive++
       var cmd = [root.helperPath]
+      if (root.demo) cmd.push("--demo")
       if (req.paginate) cmd.push("--paginate")
       cmd.push(req.method, req.path)
       if (req.body) cmd.push(JSON.stringify(req.body))
@@ -563,7 +597,9 @@ Panel {
   Process {
     id: avatarProc
     running: false
-    command: [root.helperPath, "--avatars"]
+    command: root.demo
+      ? [root.helperPath, "--demo", "--avatars"]
+      : [root.helperPath, "--avatars"]
     stdout: StdioCollector { waitForEnd: true }
     onExited: function(exitCode) {
       if (exitCode !== 0) return
@@ -691,6 +727,12 @@ Panel {
     cardDetail = next
     api("POST", "/{slug}/cards/" + cardDetail.number + "/steps/" + step.id + "/toggle", null, false,
       function(ok) { if (!ok) root.reloadCardDetail() })
+  }
+
+  // Named rather than reached for through the page item, so the key handler
+  // and the development harness ask for a card scroll the same way.
+  function scrollCardBy(dy) {
+    cardPageItem.scrollBy(dy)
   }
 
   function toggleAssignee(user) {
@@ -871,6 +913,12 @@ Panel {
   // rendered initials, which means the shell loads images from the instance.
   readonly property bool showAvatars: setting("showAvatars", false) === true
 
+  // The mark, in the bar and at the top of the panel. Kept in one place so
+  // the two never disagree about which Fizzy you are looking at.
+  readonly property string barIcon: String(setting("barIcon", "bubbles"))
+  readonly property bool brandIcon: barIcon === "logo in color"
+  readonly property string iconMark: barIcon === "bubbles" ? "bubbles" : "logo"
+
   // Writes go through omarchy-bar rather than straight to shell.json: it owns
   // the file, validates the value, and the hot-reload comes back to us as a
   // fresh `settings` object. `value` is JSON, so strings arrive quoted.
@@ -979,7 +1027,7 @@ Panel {
           boardsPageItem.resetGate()
           root.boardCursor = Math.max(0, Math.min(root.boards.length - 1, root.boardCursor + dy))
         } else if (root.page === "card" && dy !== 0) {
-          cardPageItem.scrollBy(dy)
+          root.scrollCardBy(dy)
         }
       }
       onTextKey: function(t) {
@@ -998,6 +1046,15 @@ Panel {
         }
         if (t === "G") { root.jumpToEdge(1); return }
         if (t === "r" || t === "R") { root.refresh(true); return }
+        // The board list was reachable only by clicking the grid button, which
+        // left the one navigation step in the panel that a keyboard couldn't
+        // take. From a card, step out to its board first, the way Esc does.
+        if (t === "b" || t === "B") {
+          if (root.page === "card" || root.page === "compose") root.popPage()
+          root.page = "boards"
+          root.loadBoards()
+          return
+        }
         // "," is the settings key everywhere else; the gear is the same door.
         if (t === "," && root.page !== "auth") { root.openSettingsPage(); return }
         if ((t === "n" || t === "N" || t === "c" || t === "C") && root.page === "board") { root.openCompose(""); return }
@@ -1067,6 +1124,8 @@ Panel {
             id: bubbleIcon
             FizzyIcon {
               iconSize: Style.font.display
+              mark: heroItem.fizzy.iconMark
+              brand: heroItem.fizzy.brandIcon
               tint: heroItem.fizzy.accent
               animate: heroItem.fizzy.opened
             }
@@ -1301,6 +1360,7 @@ Panel {
           HelpRow { keys: "s"; does: "Toggle golden" }
           HelpRow { keys: "1 – 9"; does: "Jump to filter" }
           HelpRow { keys: "r"; does: "Refresh" }
+          HelpRow { keys: "b"; does: "Board list" }
           HelpRow { keys: ","; does: "Settings" }
           HelpRow { keys: "Tab"; does: "Next bar panel" }
           HelpRow { keys: "Esc"; does: "Back · close" }

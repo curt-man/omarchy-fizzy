@@ -19,6 +19,8 @@
     "defaultSection": "right",
     "defaults": {
       "refreshIntervalSec": 300,
+      "barIcon": "bubbles",
+      "tintColor": "bar active",
       "showBadge": true,
       "badgeSource": "maybe",
       "tintOnTriage": true,

@@ -113,9 +113,20 @@ Item {
       PanelSeparator { foreground: root.panel.ink }
 
       // -------------------------------------------------------- bar badge
+      ChoiceRow {
+        title: "BAR ICON"
+        key: "barIcon"
+        current: root.panel.barIcon
+        choices: [
+          { label: "Bubbles", value: "bubbles" },
+          { label: "Fizzy logo", value: "logo" },
+          { label: "Fizzy logo in color", value: "logo in color" }
+        ]
+      }
+
       SettingToggle {
         label: "Show the count"
-        description: "A number beside the bubbles mark in the bar."
+        description: "A number beside the mark in the bar."
         checked: root.panel.showBadge
         onClicked: root.panel.setSetting("showBadge", !root.panel.showBadge)
       }
@@ -134,13 +145,26 @@ Item {
 
       SettingToggle {
         label: "Tint while cards wait"
-        description: "The bar's own active color, the way unread mail tints its widget."
+        description: "Colors the widget while cards sit in triage, the way unread mail tints its own."
         checked: root.panel.tintOnTriage
         onClicked: root.panel.setSetting("tintOnTriage", !root.panel.tintOnTriage)
       }
 
       ChoiceRow {
-        visible: root.panel.tintOnTriage
+        title: "THE PLUGIN'S COLOR"
+        key: "tintColor"
+        current: root.panel.tintColor
+        choices: [
+          { label: "Bar's active", value: "bar active" },
+          { label: "Theme accent", value: "accent" },
+          { label: "Theme urgent", value: "urgent" }
+        ]
+      }
+
+      ChoiceRow {
+        // A brand-colored mark paints its own gradients, so the tint has
+        // nothing left to color but the number.
+        visible: root.panel.tintOnTriage && !root.panel.brandIcon
         title: "WHAT THE TINT COLORS"
         key: "tintTarget"
         current: root.panel.tintTarget
