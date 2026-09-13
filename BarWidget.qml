@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
+import "Model.js" as Model
 
 BarWidget {
   id: root
@@ -45,6 +46,29 @@ BarWidget {
   readonly property bool badgeActive: showBadge && badgeCount > 0
   readonly property string badgeText: badgeCount > 99 ? "99+" : String(badgeCount)
 
+  // Cards waiting in Maybe? tint the widget, the way unread mail or messages
+  // tint the other bar widgets. The color is the bar's own activeColor, not a
+  // choice this plugin makes, so a themed bar stays one palette.
+  readonly property bool tintOnTriage: setting("tintOnTriage", true) !== false
+  readonly property string tintTarget: String(setting("tintTarget", "icon and count"))
+  readonly property bool triageWaiting: tintOnTriage && badgeCount > 0
+  readonly property bool tintIcon: triageWaiting && tintTarget !== "count"
+  readonly property bool tintCount: triageWaiting && tintTarget !== "icon"
+
+  // Which mark sits in the bar. "bubbles" is this plugin's own drawing and
+  // tints like every other bar glyph; the logo options are Fizzy's real icon,
+  // and "logo in color" keeps its own gradients — which means the triage tint
+  // then has only the count left to color.
+  // Same setting the panel reads, resolved the same way, so the mark in the
+  // bar and the panel it opens are one color.
+  readonly property string tintColor: String(setting("tintColor", "bar active"))
+  readonly property color tintPaint: Model.themeColor(
+    tintColor, root.bar ? root.bar.urgent : Color.urgent, Color.accent, Color.urgent)
+
+  readonly property string barIcon: String(setting("barIcon", "bubbles"))
+  readonly property bool brandIcon: barIcon === "logo in color"
+  readonly property string iconMark: barIcon === "bubbles" ? "bubbles" : "logo"
+
   // Right-click persists the toggle through the bar CLI; shell.json
   // hot-reloads, so the count cell animates open or closed in place.
   // Util.execDetached wants a single shell string, not an argv array.
@@ -77,15 +101,23 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
+    // WidgetButton defaults this to the bar's active color; the setting can
+    // point it at another of the theme's tokens instead.
+    activeColor: root.tintPaint
     // The mark is the plugin's own FizzyIcon (no font dependence); the
     // count cell beside it animates independently inside a reserved slot.
     text: ""
     labelVisible: false
     hasVisualContent: true
+    // A brand-colored mark can't carry the tint, so the pill would be the only
+    // thing reacting: leave it to the count in that mode.
+    active: root.triageWaiting && root.tintTarget === "icon and count" && !root.brandIcon
     fixedWidth: root.vertical ? -1
       : Math.round(content.implicitWidth + Style.spaceReal(8.5) * 2)
+    readonly property string badgeLabel:
+      panelLoader.item ? panelLoader.item.badgeLabel : "in Maybe?"
     tooltipText: (root.badgeCount > 0 && root.showBadge
-      ? root.badgeCount + " card" + (root.badgeCount === 1 ? "" : "s") + " in Maybe?"
+      ? root.badgeCount + " card" + (root.badgeCount === 1 ? "" : "s") + " " + badgeLabel
       : "Fizzy") + " — right-click toggles the count"
 
     onPressed: function(b) {
@@ -109,8 +141,12 @@ BarWidget {
       FizzyIcon {
         anchors.verticalCenter: parent.verticalCenter
         iconSize: Style.bar.iconCanvas
-        tint: button.foreground
+        mark: root.iconMark
+        brand: root.brandIcon
+        tint: root.tintIcon ? button.activeColor : button.foreground
         animate: false
+
+        Behavior on tint { ColorAnimation { duration: 180 } }
       }
 
       // Count cell: measured, gap included, so it collapses to nothing in one
@@ -128,9 +164,15 @@ BarWidget {
           id: countText
           anchors.right: parent.right
           text: root.badgeText
-          color: Qt.darker(button.foreground, 1.25)
+          // The count sits a shade back from the mark when it is plain status
+          // text; tinted, it carries the full color like any other alert.
+          color: root.tintCount ? button.activeColor : Qt.darker(button.foreground, 1.25)
           font.family: button.fontFamily
           font.pixelSize: button.fontSize
+
+          // The count cell also animates its width open at the same moment;
+          // easing the color keeps the two from arriving out of step.
+          Behavior on color { ColorAnimation { duration: 180 } }
 
           // Qt's documented fade idiom: dip out, swap the value, fade in.
           Behavior on text {

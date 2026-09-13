@@ -1,0 +1,2291 @@
+{
+  "identity": {
+    "id": "demo-identity",
+    "accounts": [
+      {
+        "id": "demo-account",
+        "name": "Northwind",
+        "slug": "/1",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "user": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      }
+    ]
+  },
+  "users": [
+    {
+      "id": "demo-user-1",
+      "name": "Ada Okonkwo",
+      "role": "owner",
+      "active": true,
+      "email_address": "ada.okonkwo@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-1",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-2",
+      "name": "Bruno Salgado",
+      "role": "admin",
+      "active": true,
+      "email_address": "bruno.salgado@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-2",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-3",
+      "name": "Camille Devereux",
+      "role": "member",
+      "active": true,
+      "email_address": "camille.devereux@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-3",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-4",
+      "name": "Dario Fenn",
+      "role": "member",
+      "active": true,
+      "email_address": "dario.fenn@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-4",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-5",
+      "name": "Esther Lindqvist",
+      "role": "member",
+      "active": true,
+      "email_address": "esther.lindqvist@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-5",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-6",
+      "name": "Felix Amari",
+      "role": "member",
+      "active": true,
+      "email_address": "felix.amari@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-6",
+      "avatar_url": null
+    },
+    {
+      "id": "demo-user-7",
+      "name": "Greta Nwosu",
+      "role": "member",
+      "active": true,
+      "email_address": "greta.nwosu@example.com",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/users/demo-user-7",
+      "avatar_url": null
+    }
+  ],
+  "tags": [
+    {
+      "id": "demo-tag-1",
+      "title": "infra",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+    },
+    {
+      "id": "demo-tag-2",
+      "title": "design",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-2"
+    },
+    {
+      "id": "demo-tag-3",
+      "title": "regression",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-3"
+    },
+    {
+      "id": "demo-tag-4",
+      "title": "docs",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-4"
+    },
+    {
+      "id": "demo-tag-5",
+      "title": "api",
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+    }
+  ],
+  "boards": [
+    {
+      "id": "demo-board-1",
+      "name": "Platform",
+      "all_access": true,
+      "created_at": "2026-01-04T09:12:00.000Z",
+      "auto_postpone_period_in_days": 30,
+      "url": "https://fizzy.example/1/boards/demo-board-1",
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      }
+    },
+    {
+      "id": "demo-board-2",
+      "name": "Website relaunch",
+      "all_access": true,
+      "created_at": "2026-01-18T11:02:00.000Z",
+      "auto_postpone_period_in_days": 30,
+      "url": "https://fizzy.example/1/boards/demo-board-2",
+      "creator": {
+        "id": "demo-user-3",
+        "name": "Camille Devereux",
+        "role": "member",
+        "active": true,
+        "email_address": "camille.devereux@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-3",
+        "avatar_url": null
+      }
+    },
+    {
+      "id": "demo-board-3",
+      "name": "Support triage",
+      "all_access": false,
+      "created_at": "2026-02-02T08:40:00.000Z",
+      "auto_postpone_period_in_days": 14,
+      "url": "https://fizzy.example/1/boards/demo-board-3",
+      "creator": {
+        "id": "demo-user-2",
+        "name": "Bruno Salgado",
+        "role": "admin",
+        "active": true,
+        "email_address": "bruno.salgado@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-2",
+        "avatar_url": null
+      }
+    }
+  ],
+  "columns": {
+    "demo-board-1": [
+      {
+        "id": "demo-col-1",
+        "name": "Needs to be done",
+        "color": {
+          "name": "Aqua",
+          "value": "var(--color-card-5)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+      },
+      {
+        "id": "demo-col-2",
+        "name": "Working on",
+        "color": {
+          "name": "Violet",
+          "value": "var(--color-card-6)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-2/cards"
+      },
+      {
+        "id": "demo-col-3",
+        "name": "Blocked",
+        "color": {
+          "name": "Yellow",
+          "value": "var(--color-card-3)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-3/cards"
+      },
+      {
+        "id": "demo-col-4",
+        "name": "Ready to ship",
+        "color": {
+          "name": "Green",
+          "value": "var(--color-card-2)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-4/cards"
+      }
+    ]
+  },
+  "cards": {
+    "demo-board-1": [
+      {
+        "id": "demo-card-412",
+        "number": 412,
+        "title": "Session cookies drop on the staging domain",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-3",
+            "title": "regression",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-3"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 900,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/412",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": null,
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-2",
+            "name": "Bruno Salgado",
+            "role": "admin",
+            "active": true,
+            "email_address": "bruno.salgado@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-2",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/412/comments",
+        "reactions_url": "https://fizzy.example/1/cards/412/reactions"
+      },
+      {
+        "id": "demo-card-413",
+        "number": 413,
+        "title": "Someone should own the changelog",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 5400,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/413",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": null,
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/413/comments",
+        "reactions_url": "https://fizzy.example/1/cards/413/reactions"
+      },
+      {
+        "id": "demo-card-388",
+        "number": 388,
+        "title": "Region failover runbook — dry run before the migration",
+        "status": "published",
+        "description": "Two hours, everyone in the room, nothing in production touched.",
+        "description_html": "<div class=\"action-text-content\"><p>Two hours, everyone in the room, nothing in production touched.</p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-1",
+            "title": "infra",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": true,
+        "ago_s": 2400,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/388",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-2",
+          "name": "Working on",
+          "color": {
+            "name": "Violet",
+            "value": "var(--color-card-6)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-2/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-2",
+            "name": "Bruno Salgado",
+            "role": "admin",
+            "active": true,
+            "email_address": "bruno.salgado@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-2",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-3",
+            "name": "Camille Devereux",
+            "role": "member",
+            "active": true,
+            "email_address": "camille.devereux@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-3",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-4",
+            "name": "Dario Fenn",
+            "role": "member",
+            "active": true,
+            "email_address": "dario.fenn@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-4",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-5",
+            "name": "Esther Lindqvist",
+            "role": "member",
+            "active": true,
+            "email_address": "esther.lindqvist@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-5",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [
+          {
+            "id": "demo-step-1",
+            "completed": true,
+            "created_at": "2026-02-11T10:00:00.000Z",
+            "content": "Book the window"
+          },
+          {
+            "id": "demo-step-2",
+            "completed": true,
+            "created_at": "2026-02-11T10:00:00.000Z",
+            "content": "Freeze schema changes"
+          },
+          {
+            "id": "demo-step-3",
+            "completed": false,
+            "created_at": "2026-02-11T10:00:00.000Z",
+            "content": "Rehearse the cutover"
+          },
+          {
+            "id": "demo-step-4",
+            "completed": false,
+            "created_at": "2026-02-11T10:00:00.000Z",
+            "content": "Write up what broke"
+          }
+        ],
+        "comments_url": "https://fizzy.example/1/cards/388/comments",
+        "reactions_url": "https://fizzy.example/1/cards/388/reactions"
+      },
+      {
+        "id": "demo-card-401",
+        "number": 401,
+        "title": "Post-incident review: the 03:40 page",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-1",
+            "title": "infra",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+          },
+          {
+            "id": "demo-tag-4",
+            "title": "docs",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-4"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 18000,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/401",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-3",
+          "name": "Blocked",
+          "color": {
+            "name": "Yellow",
+            "value": "var(--color-card-3)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-3/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-3",
+            "name": "Camille Devereux",
+            "role": "member",
+            "active": true,
+            "email_address": "camille.devereux@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-3",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-4",
+            "name": "Dario Fenn",
+            "role": "member",
+            "active": true,
+            "email_address": "dario.fenn@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-4",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-6",
+            "name": "Felix Amari",
+            "role": "member",
+            "active": true,
+            "email_address": "felix.amari@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-6",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": true,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/401/comments",
+        "reactions_url": "https://fizzy.example/1/cards/401/reactions"
+      },
+      {
+        "id": "demo-card-396",
+        "number": 396,
+        "title": "Rate limiter rejects the retry it just asked for",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-5",
+            "title": "api",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+          },
+          {
+            "id": "demo-tag-3",
+            "title": "regression",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-3"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 7200,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/396",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-2",
+          "name": "Working on",
+          "color": {
+            "name": "Violet",
+            "value": "var(--color-card-6)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-2/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-4",
+            "name": "Dario Fenn",
+            "role": "member",
+            "active": true,
+            "email_address": "dario.fenn@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-4",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-7",
+            "name": "Greta Nwosu",
+            "role": "member",
+            "active": true,
+            "email_address": "greta.nwosu@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-7",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/396/comments",
+        "reactions_url": "https://fizzy.example/1/cards/396/reactions"
+      },
+      {
+        "id": "demo-card-377",
+        "number": 377,
+        "title": "Empty states for the new board picker",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-2",
+            "title": "design",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-2"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 93600,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/377",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-1",
+          "name": "Needs to be done",
+          "color": {
+            "name": "Aqua",
+            "value": "var(--color-card-5)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-3",
+            "name": "Camille Devereux",
+            "role": "member",
+            "active": true,
+            "email_address": "camille.devereux@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-3",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/377/comments",
+        "reactions_url": "https://fizzy.example/1/cards/377/reactions"
+      },
+      {
+        "id": "demo-card-402",
+        "number": 402,
+        "title": "Drop the v1 tokens endpoint",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-5",
+            "title": "api",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 172800,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/402",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-1",
+          "name": "Needs to be done",
+          "color": {
+            "name": "Aqua",
+            "value": "var(--color-card-5)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-6",
+            "name": "Felix Amari",
+            "role": "member",
+            "active": true,
+            "email_address": "felix.amari@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-6",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/402/comments",
+        "reactions_url": "https://fizzy.example/1/cards/402/reactions"
+      },
+      {
+        "id": "demo-card-370",
+        "number": 370,
+        "title": "Nightly backup takes 40 minutes longer than last month",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-1",
+            "title": "infra",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 259200,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/370",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-1",
+          "name": "Needs to be done",
+          "color": {
+            "name": "Aqua",
+            "value": "var(--color-card-5)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-5",
+            "name": "Esther Lindqvist",
+            "role": "member",
+            "active": true,
+            "email_address": "esther.lindqvist@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-5",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/370/comments",
+        "reactions_url": "https://fizzy.example/1/cards/370/reactions"
+      },
+      {
+        "id": "demo-card-361",
+        "number": 361,
+        "title": "Ship the read-only API keys",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-5",
+            "title": "api",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+          },
+          {
+            "id": "demo-tag-4",
+            "title": "docs",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-4"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 3600,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/361",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-4",
+          "name": "Ready to ship",
+          "color": {
+            "name": "Green",
+            "value": "var(--color-card-2)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-4/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-7",
+            "name": "Greta Nwosu",
+            "role": "member",
+            "active": true,
+            "email_address": "greta.nwosu@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-7",
+            "avatar_url": null
+          },
+          {
+            "id": "demo-user-2",
+            "name": "Bruno Salgado",
+            "role": "admin",
+            "active": true,
+            "email_address": "bruno.salgado@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-2",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/361/comments",
+        "reactions_url": "https://fizzy.example/1/cards/361/reactions"
+      }
+    ]
+  },
+  "not_now": {
+    "demo-board-1": [
+      {
+        "id": "demo-card-344",
+        "number": 344,
+        "title": "Rewrite the importer in something faster",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-1",
+            "title": "infra",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 2592000,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/344",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-1",
+          "name": "Needs to be done",
+          "color": {
+            "name": "Aqua",
+            "value": "var(--color-card-5)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-4",
+            "name": "Dario Fenn",
+            "role": "member",
+            "active": true,
+            "email_address": "dario.fenn@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-4",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/344/comments",
+        "reactions_url": "https://fizzy.example/1/cards/344/reactions"
+      }
+    ]
+  },
+  "closed": {
+    "demo-board-1": [
+      {
+        "id": "demo-card-352",
+        "number": 352,
+        "title": "Move the status page off the old host",
+        "status": "published",
+        "description": "",
+        "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+        "image_url": null,
+        "has_attachments": false,
+        "tags": [
+          {
+            "id": "demo-tag-1",
+            "title": "infra",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+          }
+        ],
+        "closed": false,
+        "postponed": false,
+        "golden": false,
+        "ago_s": 604800,
+        "created_at": "2026-02-11T10:00:00.000Z",
+        "url": "https://fizzy.example/1/cards/352",
+        "board": {
+          "id": "demo-board-1",
+          "name": "Platform",
+          "all_access": true,
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "auto_postpone_period_in_days": 30,
+          "url": "https://fizzy.example/1/boards/demo-board-1",
+          "creator": {
+            "id": "demo-user-1",
+            "name": "Ada Okonkwo",
+            "role": "owner",
+            "active": true,
+            "email_address": "ada.okonkwo@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-1",
+            "avatar_url": null
+          }
+        },
+        "column": {
+          "id": "demo-col-4",
+          "name": "Ready to ship",
+          "color": {
+            "name": "Green",
+            "value": "var(--color-card-2)"
+          },
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-4/cards"
+        },
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "assignees": [
+          {
+            "id": "demo-user-5",
+            "name": "Esther Lindqvist",
+            "role": "member",
+            "active": true,
+            "email_address": "esther.lindqvist@example.com",
+            "created_at": "2026-01-04T09:12:00.000Z",
+            "url": "https://fizzy.example/1/users/demo-user-5",
+            "avatar_url": null
+          }
+        ],
+        "has_more_assignees": false,
+        "steps": [],
+        "comments_url": "https://fizzy.example/1/cards/352/comments",
+        "reactions_url": "https://fizzy.example/1/cards/352/reactions"
+      }
+    ]
+  },
+  "details": {
+    "412": {
+      "id": "demo-card-412",
+      "number": 412,
+      "title": "Session cookies drop on the staging domain",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-3",
+          "title": "regression",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-3"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 900,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/412",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": null,
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-2",
+          "name": "Bruno Salgado",
+          "role": "admin",
+          "active": true,
+          "email_address": "bruno.salgado@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-2",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/412/comments",
+      "reactions_url": "https://fizzy.example/1/cards/412/reactions"
+    },
+    "413": {
+      "id": "demo-card-413",
+      "number": 413,
+      "title": "Someone should own the changelog",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 5400,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/413",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": null,
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/413/comments",
+      "reactions_url": "https://fizzy.example/1/cards/413/reactions"
+    },
+    "388": {
+      "id": "demo-card-388",
+      "number": 388,
+      "title": "Region failover runbook — dry run before the migration",
+      "status": "published",
+      "description": "Two hours, everyone in the room, nothing in production touched.",
+      "description_html": "<div class=\"action-text-content\"><p>Two hours, everyone in the room, nothing in production touched.</p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-1",
+          "title": "infra",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": true,
+      "ago_s": 2400,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/388",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-2",
+        "name": "Working on",
+        "color": {
+          "name": "Violet",
+          "value": "var(--color-card-6)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-2/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-2",
+          "name": "Bruno Salgado",
+          "role": "admin",
+          "active": true,
+          "email_address": "bruno.salgado@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-2",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-3",
+          "name": "Camille Devereux",
+          "role": "member",
+          "active": true,
+          "email_address": "camille.devereux@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-3",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-4",
+          "name": "Dario Fenn",
+          "role": "member",
+          "active": true,
+          "email_address": "dario.fenn@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-4",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-5",
+          "name": "Esther Lindqvist",
+          "role": "member",
+          "active": true,
+          "email_address": "esther.lindqvist@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-5",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [
+        {
+          "id": "demo-step-1",
+          "completed": true,
+          "created_at": "2026-02-11T10:00:00.000Z",
+          "content": "Book the window"
+        },
+        {
+          "id": "demo-step-2",
+          "completed": true,
+          "created_at": "2026-02-11T10:00:00.000Z",
+          "content": "Freeze schema changes"
+        },
+        {
+          "id": "demo-step-3",
+          "completed": false,
+          "created_at": "2026-02-11T10:00:00.000Z",
+          "content": "Rehearse the cutover"
+        },
+        {
+          "id": "demo-step-4",
+          "completed": false,
+          "created_at": "2026-02-11T10:00:00.000Z",
+          "content": "Write up what broke"
+        }
+      ],
+      "comments_url": "https://fizzy.example/1/cards/388/comments",
+      "reactions_url": "https://fizzy.example/1/cards/388/reactions"
+    },
+    "401": {
+      "id": "demo-card-401",
+      "number": 401,
+      "title": "Post-incident review: the 03:40 page",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-1",
+          "title": "infra",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+        },
+        {
+          "id": "demo-tag-4",
+          "title": "docs",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-4"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 18000,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/401",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-3",
+        "name": "Blocked",
+        "color": {
+          "name": "Yellow",
+          "value": "var(--color-card-3)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-3/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-3",
+          "name": "Camille Devereux",
+          "role": "member",
+          "active": true,
+          "email_address": "camille.devereux@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-3",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-4",
+          "name": "Dario Fenn",
+          "role": "member",
+          "active": true,
+          "email_address": "dario.fenn@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-4",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-6",
+          "name": "Felix Amari",
+          "role": "member",
+          "active": true,
+          "email_address": "felix.amari@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-6",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": true,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/401/comments",
+      "reactions_url": "https://fizzy.example/1/cards/401/reactions"
+    },
+    "396": {
+      "id": "demo-card-396",
+      "number": 396,
+      "title": "Rate limiter rejects the retry it just asked for",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-5",
+          "title": "api",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+        },
+        {
+          "id": "demo-tag-3",
+          "title": "regression",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-3"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 7200,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/396",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-2",
+        "name": "Working on",
+        "color": {
+          "name": "Violet",
+          "value": "var(--color-card-6)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-2/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-4",
+          "name": "Dario Fenn",
+          "role": "member",
+          "active": true,
+          "email_address": "dario.fenn@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-4",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-7",
+          "name": "Greta Nwosu",
+          "role": "member",
+          "active": true,
+          "email_address": "greta.nwosu@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-7",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/396/comments",
+      "reactions_url": "https://fizzy.example/1/cards/396/reactions"
+    },
+    "377": {
+      "id": "demo-card-377",
+      "number": 377,
+      "title": "Empty states for the new board picker",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-2",
+          "title": "design",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-2"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 93600,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/377",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-1",
+        "name": "Needs to be done",
+        "color": {
+          "name": "Aqua",
+          "value": "var(--color-card-5)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-3",
+          "name": "Camille Devereux",
+          "role": "member",
+          "active": true,
+          "email_address": "camille.devereux@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-3",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/377/comments",
+      "reactions_url": "https://fizzy.example/1/cards/377/reactions"
+    },
+    "402": {
+      "id": "demo-card-402",
+      "number": 402,
+      "title": "Drop the v1 tokens endpoint",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-5",
+          "title": "api",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 172800,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/402",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-1",
+        "name": "Needs to be done",
+        "color": {
+          "name": "Aqua",
+          "value": "var(--color-card-5)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-6",
+          "name": "Felix Amari",
+          "role": "member",
+          "active": true,
+          "email_address": "felix.amari@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-6",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/402/comments",
+      "reactions_url": "https://fizzy.example/1/cards/402/reactions"
+    },
+    "370": {
+      "id": "demo-card-370",
+      "number": 370,
+      "title": "Nightly backup takes 40 minutes longer than last month",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-1",
+          "title": "infra",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 259200,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/370",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-1",
+        "name": "Needs to be done",
+        "color": {
+          "name": "Aqua",
+          "value": "var(--color-card-5)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-5",
+          "name": "Esther Lindqvist",
+          "role": "member",
+          "active": true,
+          "email_address": "esther.lindqvist@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-5",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/370/comments",
+      "reactions_url": "https://fizzy.example/1/cards/370/reactions"
+    },
+    "361": {
+      "id": "demo-card-361",
+      "number": 361,
+      "title": "Ship the read-only API keys",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-5",
+          "title": "api",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-5"
+        },
+        {
+          "id": "demo-tag-4",
+          "title": "docs",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-4"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 3600,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/361",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-4",
+        "name": "Ready to ship",
+        "color": {
+          "name": "Green",
+          "value": "var(--color-card-2)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-4/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-7",
+          "name": "Greta Nwosu",
+          "role": "member",
+          "active": true,
+          "email_address": "greta.nwosu@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-7",
+          "avatar_url": null
+        },
+        {
+          "id": "demo-user-2",
+          "name": "Bruno Salgado",
+          "role": "admin",
+          "active": true,
+          "email_address": "bruno.salgado@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-2",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/361/comments",
+      "reactions_url": "https://fizzy.example/1/cards/361/reactions"
+    },
+    "344": {
+      "id": "demo-card-344",
+      "number": 344,
+      "title": "Rewrite the importer in something faster",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-1",
+          "title": "infra",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 2592000,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/344",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-1",
+        "name": "Needs to be done",
+        "color": {
+          "name": "Aqua",
+          "value": "var(--color-card-5)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-1/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-4",
+          "name": "Dario Fenn",
+          "role": "member",
+          "active": true,
+          "email_address": "dario.fenn@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-4",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/344/comments",
+      "reactions_url": "https://fizzy.example/1/cards/344/reactions"
+    },
+    "352": {
+      "id": "demo-card-352",
+      "number": 352,
+      "title": "Move the status page off the old host",
+      "status": "published",
+      "description": "",
+      "description_html": "<div class=\"action-text-content\"><p><br></p></div>",
+      "image_url": null,
+      "has_attachments": false,
+      "tags": [
+        {
+          "id": "demo-tag-1",
+          "title": "infra",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/cards?tag_ids%5B%5D=demo-tag-1"
+        }
+      ],
+      "closed": false,
+      "postponed": false,
+      "golden": false,
+      "ago_s": 604800,
+      "created_at": "2026-02-11T10:00:00.000Z",
+      "url": "https://fizzy.example/1/cards/352",
+      "board": {
+        "id": "demo-board-1",
+        "name": "Platform",
+        "all_access": true,
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "auto_postpone_period_in_days": 30,
+        "url": "https://fizzy.example/1/boards/demo-board-1",
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        }
+      },
+      "column": {
+        "id": "demo-col-4",
+        "name": "Ready to ship",
+        "color": {
+          "name": "Green",
+          "value": "var(--color-card-2)"
+        },
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "cards_url": "https://fizzy.example/1/boards/demo-board-1/columns/demo-col-4/cards"
+      },
+      "creator": {
+        "id": "demo-user-1",
+        "name": "Ada Okonkwo",
+        "role": "owner",
+        "active": true,
+        "email_address": "ada.okonkwo@example.com",
+        "created_at": "2026-01-04T09:12:00.000Z",
+        "url": "https://fizzy.example/1/users/demo-user-1",
+        "avatar_url": null
+      },
+      "assignees": [
+        {
+          "id": "demo-user-5",
+          "name": "Esther Lindqvist",
+          "role": "member",
+          "active": true,
+          "email_address": "esther.lindqvist@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-5",
+          "avatar_url": null
+        }
+      ],
+      "has_more_assignees": false,
+      "steps": [],
+      "comments_url": "https://fizzy.example/1/cards/352/comments",
+      "reactions_url": "https://fizzy.example/1/cards/352/reactions"
+    }
+  },
+  "comments": {
+    "388": [
+      {
+        "id": "demo-comment-1",
+        "created_at": null,
+        "ago_s": 5400,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-3",
+          "name": "Camille Devereux",
+          "role": "member",
+          "active": true,
+          "email_address": "camille.devereux@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-3",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Booked for Thursday 14:00. I've told support so nobody promises a deploy that afternoon.",
+          "html": "<p>Booked for Thursday 14:00. I've told support so nobody promises a deploy that afternoon.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-1",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-1/reactions"
+      },
+      {
+        "id": "demo-comment-2",
+        "created_at": null,
+        "ago_s": 3000,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-4",
+          "name": "Dario Fenn",
+          "role": "member",
+          "active": true,
+          "email_address": "dario.fenn@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-4",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Schema freeze is on. Two migrations are queued behind it — neither is urgent.",
+          "html": "<p>Schema freeze is on. Two migrations are queued behind it — neither is urgent.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-2",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-2/reactions"
+      },
+      {
+        "id": "demo-comment-3",
+        "created_at": null,
+        "ago_s": 2400,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-1",
+          "name": "Ada Okonkwo",
+          "role": "owner",
+          "active": true,
+          "email_address": "ada.okonkwo@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-1",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Last dry run we lost eleven minutes finding who owned DNS. Let's have that answer written down first.",
+          "html": "<p>Last dry run we lost eleven minutes finding who owned DNS. Let's have that answer written down first.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-3",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-3/reactions"
+      }
+    ],
+    "401": [
+      {
+        "id": "demo-comment-4",
+        "created_at": null,
+        "ago_s": 21600,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-6",
+          "name": "Felix Amari",
+          "role": "member",
+          "active": true,
+          "email_address": "felix.amari@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-6",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Timeline is reconstructed up to the point the alert fired. The five minutes before it are still a guess.",
+          "html": "<p>Timeline is reconstructed up to the point the alert fired. The five minutes before it are still a guess.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-4",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-4/reactions"
+      },
+      {
+        "id": "demo-comment-5",
+        "created_at": null,
+        "ago_s": 18000,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-3",
+          "name": "Camille Devereux",
+          "role": "member",
+          "active": true,
+          "email_address": "camille.devereux@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-3",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Blocked on the log retention window — the interesting part aged out before anyone looked.",
+          "html": "<p>Blocked on the log retention window — the interesting part aged out before anyone looked.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-5",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-5/reactions"
+      }
+    ],
+    "396": [
+      {
+        "id": "demo-comment-6",
+        "created_at": null,
+        "ago_s": 7800,
+        "updated_at": null,
+        "creator": {
+          "id": "demo-user-7",
+          "name": "Greta Nwosu",
+          "role": "member",
+          "active": true,
+          "email_address": "greta.nwosu@example.com",
+          "created_at": "2026-01-04T09:12:00.000Z",
+          "url": "https://fizzy.example/1/users/demo-user-7",
+          "avatar_url": null
+        },
+        "body": {
+          "plain_text": "Reproduced it: the Retry-After we send is shorter than the window we then enforce.",
+          "html": "<p>Reproduced it: the Retry-After we send is shorter than the window we then enforce.</p>"
+        },
+        "url": "https://fizzy.example/1/comments/demo-comment-6",
+        "reactions_url": "https://fizzy.example/1/comments/demo-comment-6/reactions"
+      }
+    ]
+  }
+}

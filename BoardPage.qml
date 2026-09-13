@@ -158,6 +158,8 @@ Item {
         FizzyIcon {
           anchors.horizontalCenter: parent.horizontalCenter
           iconSize: Style.font.displayLarge
+          mark: panel.iconMark
+          brand: panel.brandIcon
           tint: panel.dim
           animate: parent.visible && panel.opened && !panel.loadingCards
         }

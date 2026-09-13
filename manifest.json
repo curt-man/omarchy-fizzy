@@ -5,10 +5,10 @@
   "version": "1.0.0",
   "author": "Ryan Yogan",
   "license": "MIT",
-  "description": "Fizzy (fizzy.do) kanban in your bar — browse boards, triage and move cards, add new ones, all from a mobile-style panel.",
+  "description": "Fizzy kanban in your bar — browse boards, triage and move cards, add new ones, all from a mobile-style panel. Works with app.fizzy.do or your own instance.",
   "homepage": "https://github.com/ryanyogan/omarchy-fizzy",
   "repository": "https://github.com/ryanyogan/omarchy-fizzy",
-  "keywords": ["fizzy", "kanban", "37signals", "tasks", "cards"],
+  "keywords": ["fizzy", "kanban", "37signals", "tasks", "cards", "self-hosted"],
   "kinds": ["bar-widget"],
   "entryPoints": { "barWidget": "BarWidget.qml" },
   "barWidget": {
@@ -19,7 +19,13 @@
     "defaultSection": "right",
     "defaults": {
       "refreshIntervalSec": 300,
-      "showBadge": true
+      "barIcon": "bubbles",
+      "tintColor": "bar active",
+      "showBadge": true,
+      "badgeSource": "maybe",
+      "tintOnTriage": true,
+      "tintTarget": "icon and count",
+      "showAvatars": false
     },
     "schema": [
       {
@@ -36,6 +42,33 @@
         "type": "boolean",
         "label": "Show the triage card count next to the bar icon",
         "defaultValue": true
+      },
+      {
+        "key": "badgeSource",
+        "type": "string",
+        "label": "What the bar count counts",
+        "options": ["maybe", "assigned to me", "in play", "all open"],
+        "defaultValue": "maybe"
+      },
+      {
+        "key": "tintOnTriage",
+        "type": "boolean",
+        "label": "Tint the bar widget while cards wait in Maybe?",
+        "defaultValue": true
+      },
+      {
+        "key": "tintTarget",
+        "type": "string",
+        "label": "What the tint colors",
+        "options": ["icon and count", "count", "icon"],
+        "defaultValue": "icon and count"
+      },
+      {
+        "key": "showAvatars",
+        "type": "boolean",
+        "label": "Show people's Fizzy avatars instead of their initials",
+        "defaultValue": false,
+        "description": "Fetches each avatar from your Fizzy host. Off by default because it means the shell loads remote images."
       }
     ]
   }

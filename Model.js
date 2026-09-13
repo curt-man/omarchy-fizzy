@@ -1,6 +1,56 @@
 // Model.js — pure helpers for the Fizzy widget. No QML state in here.
 .pragma library
 
+// Fizzy runs at app.fizzy.do, but it also self-hosts, so every request goes
+// through config.base_url and this default is only the fallback. The value is
+// user-typed (auth page or a hand-edited config file), so normalize it before
+// it reaches curl rather than trusting whatever was pasted.
+var DEFAULT_BASE_URL = "https://app.fizzy.do";
+
+function defaultBaseUrl() {
+  return DEFAULT_BASE_URL;
+}
+
+// Returns a canonical "scheme://host[:port][/prefix]" with no trailing slash,
+// or "" when the input can't be a Fizzy address. Blank means "the default".
+function normalizeBaseUrl(input) {
+  var raw = String(input || "").trim();
+  if (raw === "") return DEFAULT_BASE_URL;
+  if (/[\s"'<>\\]/.test(raw)) return "";
+
+  if (!/^[a-z][a-z0-9+.\-]*:\/\//i.test(raw)) {
+    // A scheme is "word://"; a colon followed by digits is a port, so
+    // "localhost:3000" stays a host. Anything else (file:, javascript:, ...)
+    // is a typo at best.
+    if (/^[a-z][a-z0-9+.\-]*:(?!\d)/i.test(raw)) return "";
+    // The common paste is a bare host — "fizzy.example.com" — and https is
+    // the only sane default off-machine. A loopback host is the exception:
+    // it is a dev instance, which does not speak TLS.
+    var loopback = /^(localhost|127\.[0-9.]+|\[::1\])(:|\/|$)/i.test(raw);
+    raw = (loopback ? "http://" : "https://") + raw;
+  }
+
+  var match = /^(https?):\/\/([^\/?#]+)([^?#]*)/i.exec(raw);
+  if (!match) return "";
+
+  var host = match[2];
+  // Credentials in the host would ride along on every request URL.
+  if (host.indexOf("@") >= 0) return "";
+  var named = /^[a-z0-9][a-z0-9.\-]*(:[0-9]{1,5})?$/i.test(host);
+  var bracketed = /^\[[0-9a-f:.]+\](:[0-9]{1,5})?$/i.test(host);
+  if (!named && !bracketed) return "";
+
+  // A path prefix is kept (some instances live under one); the trailing
+  // slash is not, because every API path already starts with one.
+  var prefix = String(match[3] || "").replace(/\/+$/, "");
+  return match[1].toLowerCase() + "://" + host.toLowerCase() + prefix;
+}
+
+// What to show a human: the address without the scheme noise.
+function baseUrlLabel(url) {
+  return String(url || "").replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+}
+
 // Fizzy column palette. The API reports colors as CSS variables
 // (var(--color-card-N)) with a human name; map both to hex per theme.
 var PALETTE = {
@@ -148,7 +198,11 @@ function commentHtml(comment) {
 }
 
 function tagTitle(tag) {
-  return typeof tag === "object" ? (tag.title || "") : String(tag || "");
+  // typeof null is "object", so the guard has to be the value and not its
+  // type: one null in a tags array would otherwise throw inside a binding,
+  // and a binding that throws leaves the row it was drawing blank.
+  if (tag && typeof tag === "object") return tag.title || "";
+  return String(tag || "");
 }
 
 function hasAssignee(card, userId) {
@@ -185,4 +239,14 @@ function accountsFromIdentity(identity) {
     }
   }
   return accounts;
+}
+
+// Resolve a tintColor setting to one of the theme's own colors. The caller
+// passes the three candidates because Color and the bar are QML objects this
+// file cannot see; what belongs here is the mapping, so the panel and the bar
+// widget can't drift apart on what "accent" means.
+function themeColor(name, barActive, accent, urgent) {
+  if (name === "accent") return accent;
+  if (name === "urgent") return urgent;
+  return barActive;
 }

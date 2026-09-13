@@ -62,7 +62,17 @@ Panel {
   readonly property bool lightTheme:
     0.2126 * Color.background.r + 0.7152 * Color.background.g + 0.0722 * Color.background.b > 0.5
   readonly property color ink: root.bar ? root.bar.foreground : Color.foreground
-  readonly property color accent: Color.accent
+  // One color for the whole plugin — the panel's accent and the bar's tint are
+  // the same answer, so the widget and the panel it opens never disagree about
+  // what this plugin's color is.
+  //
+  // The choice is between the theme's own tokens, never a hex value: a bar
+  // holding a color the theme didn't choose is the thing themes exist to
+  // prevent. The default is the bar's active color, which is what unread mail
+  // and messages already use up there.
+  readonly property string tintColor: String(setting("tintColor", "bar active"))
+  readonly property color accent: Model.themeColor(
+    tintColor, root.bar ? root.bar.urgent : Color.urgent, Color.accent, Color.urgent)
   readonly property color urgent: root.bar ? root.bar.urgent : Color.urgent
   readonly property color dim: Qt.darker(ink, 1.5)
   readonly property color hairline: Util.alpha(ink, 0.12)
@@ -78,7 +88,12 @@ Panel {
   property var config: ({})
   property bool configLoaded: false
   readonly property bool hasToken: !!(config && config.token)
-  readonly property bool authed: hasToken && !!(config && config.account_slug)
+  // The development harness sets this; nothing in the shell does. On, every
+  // request goes to the helper's --demo fixtures instead of to a server, so
+  // the window can be driven and photographed with no account behind it.
+  property bool demo: false
+
+  readonly property bool authed: demo || (hasToken && !!(config && config.account_slug))
   readonly property string boardId: config && config.board_id ? String(config.board_id) : ""
   readonly property string boardName: {
     for (var i = 0; i < boards.length; i++)
@@ -86,18 +101,35 @@ Panel {
     return ""
   }
 
+  // Fizzy self-hosts, so the host is config, not a constant. Normalized on
+  // read as well as on write: the config file is hand-editable, and a bad
+  // base_url there would otherwise reach curl on every request.
+  readonly property string defaultBaseUrl: Model.defaultBaseUrl()
+  readonly property string baseUrl: {
+    var normalized = Model.normalizeBaseUrl(config && config.base_url ? config.base_url : "")
+    return normalized !== "" ? normalized : defaultBaseUrl
+  }
+  readonly property string userId: config && config.user_id ? String(config.user_id) : ""
+  readonly property string instanceLabel: Model.baseUrlLabel(baseUrl)
+  readonly property bool customInstance: baseUrl !== defaultBaseUrl
+
   onConfigLoadedChanged: if (configLoaded) Qt.callLater(function() { root.refresh(false) })
 
   property FileView configFile: FileView {
     path: root.configPath
     watchChanges: true
     printErrors: false
-    onFileChanged: reload()
+    // Demo runs have their own config and never read or write yours — the
+    // harness would otherwise open on whatever account this machine is
+    // connected to, which is the one thing a screenshot must never show.
+    onFileChanged: if (!root.demo) reload()
     onLoaded: {
+      if (root.demo) return
       root.config = Model.parseJson(text(), {})
       root.configLoaded = true
     }
     onLoadFailed: {
+      if (root.demo) return
       root.config = ({})
       root.configLoaded = true
     }
@@ -127,6 +159,19 @@ Panel {
   }
 
   function saveConfig(values) {
+    // A demo keeps its config in memory: the fixtures already answer as if the
+    // account existed, and writing would put demo values in a real file.
+    if (demo) {
+      var merged = ({})
+      for (var have in config) merged[have] = config[have]
+      for (var name in values) {
+        if (values[name] === null) delete merged[name]
+        else merged[name] = values[name]
+      }
+      config = merged
+      onConfigSaved()
+      return
+    }
     // Base on pendingConfig when a save is already in flight, so back-to-back
     // saves can't rebuild from stale state and drop the first save's keys.
     var base = pendingConfig || config
@@ -211,6 +256,7 @@ Panel {
     if (request.callback) request.callback(exitCode === 0, stdoutText, exitCode, stderrText)
     if (exitCode === 4) {
       root.tokenRejected = true
+      root.authPagePinned = false
       root.notice = "Fizzy rejected the token — paste a new one"
       root.page = "auth"
     }
@@ -232,6 +278,7 @@ Panel {
       request = req
       root.apiActive++
       var cmd = [root.helperPath]
+      if (root.demo) cmd.push("--demo")
       if (req.paginate) cmd.push("--paginate")
       cmd.push(req.method, req.path)
       if (req.body) cmd.push(JSON.stringify(req.body))
@@ -284,8 +331,29 @@ Panel {
   readonly property var grouped: Model.groupOpenCards(openCards)
   readonly property var filters: Model.buildFilters(columns, grouped, lightTheme)
   readonly property var visibleCards: Model.cardsForFilter(activeFilterKey, grouped, notNowCards, closedCards)
-  readonly property int badgeCount: authed && boardId !== "" ? grouped.maybe.length : 0
   readonly property int inPlayCount: openCards.length - grouped.maybe.length
+  readonly property int assignedToMeCount: {
+    if (userId === "") return 0
+    var mine = 0
+    for (var i = 0; i < openCards.length; i++)
+      if (Model.hasAssignee(openCards[i], userId)) mine++
+    return mine
+  }
+
+  // The bar badge counts one pile, and which pile is a setting. Everything
+  // here is already loaded for the board, so switching source costs no fetch.
+  readonly property int badgeCount: {
+    if (!authed || boardId === "") return 0
+    if (badgeSource === "assigned to me") return assignedToMeCount
+    if (badgeSource === "in play") return inPlayCount
+    if (badgeSource === "all open") return openCards.length
+    return grouped.maybe.length
+  }
+  readonly property string badgeLabel:
+    badgeSource === "assigned to me" ? "assigned to you"
+    : badgeSource === "in play" ? "in play"
+    : badgeSource === "all open" ? "open"
+    : "in Maybe?"
 
   Timer {
     interval: 60000
@@ -304,7 +372,7 @@ Panel {
 
   function pageLevel(name) {
     if (name === "board") return 1
-    if (name === "card" || name === "compose") return 2
+    if (name === "card" || name === "compose" || name === "settings") return 2
     return 0
   }
   readonly property int currentLevel: pageLevel(page)
@@ -334,6 +402,33 @@ Panel {
   }
 
   function focusKeys() { keyCatcher.forceActiveFocus() }
+
+  // The auth page normally means "not connected". It is also how you move to
+  // another instance, and then the config is still good: pin it so a refresh
+  // can't bounce the page away, and offer the way back.
+  property bool authPagePinned: false
+
+  // Pushed, not swapped: Back returns to the board or the boards list, and
+  // the connect page opened from here still has somewhere to go back to.
+  function openSettingsPage() {
+    if (page === "settings") return
+    pushPage("settings")
+  }
+
+  function openConnectPage() {
+    notice = ""
+    authPagePinned = authed
+    page = "auth"
+    pageStack = []
+  }
+
+  function leaveConnectPage() {
+    authPagePinned = false
+    notice = ""
+    page = boardId !== "" ? "board" : "boards"
+    pageStack = []
+    Qt.callLater(focusKeys)
+  }
 
   // Vim pending-key state: `g` waits briefly for a second `g`. Any other
   // interaction cancels it, so `g` `j` `g` can't be misread as `gg`.
@@ -385,7 +480,8 @@ Panel {
     if (!hasToken || tokenRejected) { page = "auth"; return }
     if (!authed) { resolveIdentity(); return }
     if (boards.length === 0 || force) loadBoards()
-    if (page === "auth" || page === "") {
+    if (userId === "" && badgeSource === "assigned to me") resolveUserId()
+    if ((page === "auth" && !authPagePinned) || page === "") {
       page = boardId !== "" ? "board" : "boards"
       pageStack = []
       Qt.callLater(focusKeys)
@@ -398,10 +494,11 @@ Panel {
     api("GET", "/my/identity", null, false, function(ok, out) {
       if (!ok) {
         // Leaving "Connecting…" up forever would read as a hang.
-        root.notice = "Can't reach Fizzy — check your connection and try again"
+        root.notice = "Can't reach " + root.instanceLabel + " — check the address and your connection"
         return
       }
-      var accounts = Model.accountsFromIdentity(Model.parseJson(out, {}))
+      var identity = Model.parseJson(out, {})
+      var accounts = Model.accountsFromIdentity(identity)
       if (accounts.length === 0) {
         root.notice = "No Fizzy accounts found for this token"
         return
@@ -410,9 +507,23 @@ Panel {
         root.notice = ""
         root.refresh(true)
       }
-      root.saveConfig({ account_slug: accounts[0].slug })
+      root.saveConfig({
+        account_slug: accounts[0].slug,
+        user_id: identity.id ? String(identity.id) : null
+      })
     })
   }
+
+  function resolveUserId() {
+    if (identityInFlight) return
+    identityInFlight = true
+    api("GET", "/my/identity", null, false, function(ok, out) {
+      root.identityInFlight = false
+      var identity = Model.parseJson(out, {})
+      if (ok && identity.id) root.saveConfig({ user_id: String(identity.id) })
+    })
+  }
+  property bool identityInFlight: false
 
   function loadBoards() {
     api("GET", "/{slug}/boards", null, true, function(ok, out) {
@@ -453,10 +564,48 @@ Panel {
       api("GET", "/{slug}/users", null, true, function(ok, out) {
         if (ok) root.users = Model.parseArray(out).filter(function(user) { return user.active !== false })
       })
+    resolveAvatars()
     if (tags.length === 0)
       api("GET", "/{slug}/tags", null, true, function(ok, out) {
         if (ok) root.tags = Model.parseArray(out)
       })
+  }
+
+  // Which people have a real picture. Fizzy answers its avatar endpoint with
+  // an SVG it renders itself for everyone else, and Qt's SVG renderer draws
+  // that file as a smear in one corner — so the helper probes each avatar's
+  // content type once and the rest keep the initials disc drawn here.
+  property var avatarUrls: ({})
+  property bool avatarsResolved: false
+
+  function resolveAvatars() {
+    if (!showAvatars || avatarsResolved || avatarProc.running || !authed) return
+    avatarProc.running = true
+  }
+
+  function avatarUrlFor(person) {
+    if (!showAvatars || !person || !person.id) return ""
+    return avatarUrls[String(person.id)] || ""
+  }
+
+  onShowAvatarsChanged: {
+    avatarsResolved = false
+    avatarUrls = ({})
+    if (showAvatars) Qt.callLater(resolveAvatars)
+  }
+
+  Process {
+    id: avatarProc
+    running: false
+    command: root.demo
+      ? [root.helperPath, "--demo", "--avatars"]
+      : [root.helperPath, "--avatars"]
+    stdout: StdioCollector { waitForEnd: true }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) return
+      root.avatarUrls = Model.parseJson(stdout.text, {})
+      root.avatarsResolved = true
+    }
   }
 
   function loadNotNow() {
@@ -578,6 +727,12 @@ Panel {
     cardDetail = next
     api("POST", "/{slug}/cards/" + cardDetail.number + "/steps/" + step.id + "/toggle", null, false,
       function(ok) { if (!ok) root.reloadCardDetail() })
+  }
+
+  // Named rather than reached for through the page item, so the key handler
+  // and the development harness ask for a card scroll the same way.
+  function scrollCardBy(dy) {
+    cardPageItem.scrollBy(dy)
   }
 
   function toggleAssignee(user) {
@@ -703,13 +858,74 @@ Panel {
 
   // ---------------------------------------------------------------- auth
 
-  function connectWithToken(token) {
+  function connectWithToken(token, instance) {
     var trimmed = String(token || "").trim()
     if (trimmed === "") { notice = "Paste a token first"; return }
+    var address = Model.normalizeBaseUrl(instance)
+    if (address === "") { notice = "That address doesn't look like a Fizzy instance"; return }
+
+    var moved = address !== baseUrl
     tokenRejected = false
+    authPagePinned = false
     notice = "Connecting…"
     afterSave = function() { root.resolveIdentity() }
-    saveConfig({ token: trimmed, base_url: config.base_url || "https://app.fizzy.do", account_slug: null })
+
+    var values = { token: trimmed, base_url: address, account_slug: null }
+    // Boards, cards and users are all ids on the old host. Carrying them to
+    // a new one would show another server's numbers until the first reload.
+    if (moved) {
+      values.board_id = null
+      forgetInstance()
+    }
+    saveConfig(values)
+  }
+
+  // Everything fetched from the instance we are leaving.
+  function forgetInstance() {
+    boards = []
+    columns = []
+    openCards = []
+    notNowCards = []
+    closedCards = []
+    users = []
+    tags = []
+    avatarUrls = ({})
+    avatarsResolved = false
+    lastCardsJson = ""
+    cardDetail = null
+    cardComments = []
+    activeFilterKey = "maybe"
+    cardCursor = -1
+    boardCursor = 0
+  }
+
+  // ---------------------------------------------------------------- settings
+
+  // The settings page edits these; the bar widget reads the same keys. Both
+  // sides go through the shell's settings store, so a change from the panel,
+  // from `omarchy bar set`, or from the shell's own settings UI is one change.
+  readonly property bool showBadge: setting("showBadge", true) === true
+  readonly property string badgeSource: String(setting("badgeSource", "maybe"))
+  readonly property bool tintOnTriage: setting("tintOnTriage", true) !== false
+  readonly property string tintTarget: String(setting("tintTarget", "icon and count"))
+
+  // Opt-in: on, people are drawn with their Fizzy avatar instead of locally
+  // rendered initials, which means the shell loads images from the instance.
+  readonly property bool showAvatars: setting("showAvatars", false) === true
+
+  // The mark, in the bar and at the top of the panel. Kept in one place so
+  // the two never disagree about which Fizzy you are looking at.
+  readonly property string barIcon: String(setting("barIcon", "bubbles"))
+  readonly property bool brandIcon: barIcon === "logo in color"
+  readonly property string iconMark: barIcon === "bubbles" ? "bubbles" : "logo"
+
+  // Writes go through omarchy-bar rather than straight to shell.json: it owns
+  // the file, validates the value, and the hot-reload comes back to us as a
+  // fresh `settings` object. `value` is JSON, so strings arrive quoted.
+  function setSetting(key, value) {
+    Util.execDetached("omarchy-bar set " + Util.shellQuote(moduleName)
+      + " " + Util.shellQuote(key)
+      + " " + Util.shellQuote(JSON.stringify(value)) + " --json")
   }
 
   // Background poll keeps the bar badge honest while the panel is closed.
@@ -741,15 +957,18 @@ Panel {
 
   readonly property string heroTitle:
     page === "auth" ? "Fizzy"
+    : page === "settings" ? "Settings"
     : page === "boards" ? "Fizzy"
     : page === "board" ? (boardName || "Board")
     : page === "card" ? (cardDetail ? "#" + cardDetail.number : "Card")
     : "New card"
 
   readonly property string heroMeta:
-    page === "auth" ? "Connect your account"
+    page === "auth" ? (authPagePinned ? "Switch instance" : "Connect your account")
+    : page === "settings" ? instanceLabel
     : offline ? "Offline — press r to retry"
-    : page === "boards" ? (boards.length > 0 ? boards.length + " boards" : "Your boards")
+    : page === "boards" ? ((boards.length > 0 ? boards.length + " boards" : "Your boards")
+        + (customInstance ? " · " + instanceLabel : ""))
     : page === "board" ? (grouped.maybe.length + " maybe · " + inPlayCount + " in play")
     : page === "card" ? ((boardName || "") + (cardDetail ? " · " + Model.relativeTime(cardDetail.last_active_at, nowTick) : ""))
     : (boardName || "")
@@ -784,7 +1003,8 @@ Panel {
       onCloseRequested: {
         root.clearPendingVimKey()
         if (root.helpVisible) root.helpVisible = false
-        else if (root.page === "card" || root.page === "compose") root.popPage()
+        else if (root.page === "auth" && root.authPagePinned) root.leaveConnectPage()
+        else if (root.page === "card" || root.page === "compose" || root.page === "settings") root.popPage()
         else if (root.page === "boards" && root.boardId !== "") root.page = "board"
         else root.close()
       }
@@ -807,7 +1027,7 @@ Panel {
           boardsPageItem.resetGate()
           root.boardCursor = Math.max(0, Math.min(root.boards.length - 1, root.boardCursor + dy))
         } else if (root.page === "card" && dy !== 0) {
-          cardPageItem.scrollBy(dy)
+          root.scrollCardBy(dy)
         }
       }
       onTextKey: function(t) {
@@ -826,6 +1046,17 @@ Panel {
         }
         if (t === "G") { root.jumpToEdge(1); return }
         if (t === "r" || t === "R") { root.refresh(true); return }
+        // The board list was reachable only by clicking the grid button, which
+        // left the one navigation step in the panel that a keyboard couldn't
+        // take. From a card, step out to its board first, the way Esc does.
+        if (t === "b" || t === "B") {
+          if (root.page === "card" || root.page === "compose") root.popPage()
+          root.page = "boards"
+          root.loadBoards()
+          return
+        }
+        // "," is the settings key everywhere else; the gear is the same door.
+        if (t === "," && root.page !== "auth") { root.openSettingsPage(); return }
         if ((t === "n" || t === "N" || t === "c" || t === "C") && root.page === "board") { root.openCompose(""); return }
         if (t === "o" || t === "O") {
           if (root.page === "board" && root.cardCursor >= 0 && root.cardCursor < root.visibleCards.length)
@@ -893,6 +1124,8 @@ Panel {
             id: bubbleIcon
             FizzyIcon {
               iconSize: Style.font.display
+              mark: heroItem.fizzy.iconMark
+              brand: heroItem.fizzy.brandIcon
               tint: heroItem.fizzy.accent
               animate: heroItem.fizzy.opened
             }
@@ -914,11 +1147,22 @@ Panel {
 
           Component {
             id: refreshAction
-            PanelActionButton {
-              iconText: "󰑐"
-              tooltipText: "Refresh"
-              foreground: heroItem.fizzy.dim
-              onClicked: heroItem.fizzy.refresh(true)
+            Row {
+              spacing: Style.space(2)
+
+              PanelActionButton {
+                iconText: "󰑐"
+                tooltipText: "Refresh"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.refresh(true)
+              }
+
+              PanelActionButton {
+                iconText: "󰒓"
+                tooltipText: "Settings — instance, badge, avatars"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.openSettingsPage()
+              }
             }
           }
 
@@ -946,6 +1190,13 @@ Panel {
                 tooltipText: "All boards"
                 foreground: heroItem.fizzy.dim
                 onClicked: { heroItem.fizzy.page = "boards"; heroItem.fizzy.loadBoards() }
+              }
+
+              PanelActionButton {
+                iconText: "󰒓"
+                tooltipText: "Settings — instance, badge, avatars"
+                foreground: heroItem.fizzy.dim
+                onClicked: heroItem.fizzy.openSettingsPage()
               }
 
               PanelActionButton {
@@ -990,7 +1241,8 @@ Panel {
             Item { id: inner; anchors.fill: parent }
           }
 
-          PageSlot { name: "auth";   AuthPage   { id: authPageItem; anchors.fill: parent; panel: root } }
+          PageSlot { name: "auth";     AuthPage     { id: authPageItem; anchors.fill: parent; panel: root } }
+          PageSlot { name: "settings"; SettingsPage { id: settingsPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "boards"; BoardsPage { id: boardsPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "board";  BoardPage  { id: boardPageItem; anchors.fill: parent; panel: root } }
           PageSlot { name: "card";   CardPage   { id: cardPageItem; anchors.fill: parent; panel: root } }
@@ -1108,6 +1360,8 @@ Panel {
           HelpRow { keys: "s"; does: "Toggle golden" }
           HelpRow { keys: "1 – 9"; does: "Jump to filter" }
           HelpRow { keys: "r"; does: "Refresh" }
+          HelpRow { keys: "b"; does: "Board list" }
+          HelpRow { keys: ","; does: "Settings" }
           HelpRow { keys: "Tab"; does: "Next bar panel" }
           HelpRow { keys: "Esc"; does: "Back · close" }
           HelpRow { keys: "?"; does: "This help" }

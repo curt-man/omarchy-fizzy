@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# fizzy-fetch — curl wrapper for the Fizzy API (app.fizzy.do).
+# fizzy-fetch — curl wrapper for the Fizzy API.
+#
+# The host comes from base_url in the config file, so this talks to any Fizzy
+# instance; app.fizzy.do is only the default.
 #
 # The access token is read from the widget's config file and handed to curl
 # via a mode-0600 curl config file, so it never appears on any argv.
@@ -8,12 +11,24 @@
 #   fizzy-fetch [--config PATH] [--paginate] METHOD API_PATH [JSON_BODY]
 #
 #   METHOD    GET | POST | PUT | DELETE
-#   API_PATH  path on the Fizzy host; the literal token {slug} is replaced
+#   API_PATH  path on the configured host; the literal token {slug} is replaced
 #             with the configured account slug (e.g. "/{slug}/boards")
 #   JSON_BODY optional request body, sent as application/json
 #
 #   --paginate follows rel="next" Link headers, capped at 5 pages (500 items
 #   at Fizzy's page size) to bound worst-case latency in the shell.
+#
+#   --demo answers from fizzy-demo.json instead of from any server, and
+#   refuses every write. No token, no network, no account: it is what the
+#   development harness and the screenshot script run against, so a picture of
+#   this widget never contains anybody's real board.
+#
+#   --avatars takes no METHOD or API_PATH. It reads the account's people and
+#   writes {"<user id>": "<direct image url>"} for everyone who has a real
+#   picture. Fizzy answers its avatar endpoint with an SVG it renders itself
+#   for anyone who never uploaded one, and Qt's SVG renderer cannot draw that
+#   file — percentage geometry collapses into one corner — so the panel must
+#   know which avatars are raster images before it tries to show any.
 #
 # Exit codes: 0 ok (body on stdout), 3 not configured, 4 auth rejected,
 #             1 any other failure (detail on stderr).
@@ -21,19 +36,103 @@ set -euo pipefail
 
 CONFIG="$HOME/.local/state/omarchy/settings/fizzy.json"
 PAGINATE=0
+AVATARS=0
+DEMO=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
     --paginate) PAGINATE=1; shift ;;
+    --avatars) AVATARS=1; shift ;;
+    --demo) DEMO=1; shift ;;
     --) shift; break ;;
     *) break ;;
   esac
 done
 
-METHOD="${1:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
-API_PATH="${2:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
-BODY="${3:-}"
+if [[ "$DEMO" == "1" ]]; then
+  FIXTURES="$(dirname "$(realpath "$0")")/fizzy-demo.json"
+  [[ -r "$FIXTURES" ]] || { echo "fizzy-fetch: $FIXTURES missing" >&2; exit 3; }
+
+  # Nobody has a photo in the fixtures, so the avatar probe has nothing to
+  # resolve — and answering {} keeps it from reaching the network to find out.
+  if [[ "$AVATARS" == "1" ]]; then echo '{}'; exit 0; fi
+
+  DEMO_METHOD="${1:-GET}"
+  DEMO_PATH="${2:-}"
+
+  # Reads only. A demo that could write would eventually be pointed at a real
+  # instance by someone assuming --demo meant "safe" in both directions.
+  if [[ "$DEMO_METHOD" != "GET" ]]; then
+    echo "fizzy-fetch: --demo is read-only ($DEMO_METHOD $DEMO_PATH refused)" >&2
+    exit 1
+  fi
+
+  # ago_s -> a timestamp relative to right now, everywhere it appears, so the
+  # screenshots keep saying "40m" however old the fixtures get.
+  demo_out() {
+    jq --argjson now "$(date +%s)" '
+      def dated: if type == "object" and has("ago_s")
+                   then . + { last_active_at: (($now - .ago_s) | todate),
+                              created_at: (.created_at // (($now - .ago_s) | todate)) }
+                        | del(.ago_s)
+                   else . end;
+      def stamp: walk(dated);
+      stamp' <<<"$1"
+  }
+
+  # Comments carry ago_s too, but their date lands in created_at, not
+  # last_active_at — the card page reads that one.
+  demo_comments() {
+    jq --argjson now "$(date +%s)" '
+      map(. + { created_at: (($now - .ago_s) | todate) } | del(.ago_s))' <<<"$1"
+  }
+
+  pick() { jq -c "$1" "$FIXTURES"; }
+
+  # Query strings pick which slice of a board's cards is wanted.
+  DEMO_QUERY="${DEMO_PATH#*\?}"
+  [[ "$DEMO_QUERY" == "$DEMO_PATH" ]] && DEMO_QUERY=""
+  DEMO_BARE="${DEMO_PATH%%\?*}"
+  # Board ids reach here percent-encoded, inside board_ids[]=...
+  DEMO_BOARD="$(sed -n 's/.*board_ids%5B%5D=\([^&]*\).*/\1/p' <<<"$DEMO_QUERY")"
+
+  case "$DEMO_BARE" in
+    /my/identity) demo_out "$(pick '.identity')" ;;
+    */users)      demo_out "$(pick '.users')" ;;
+    */tags)       demo_out "$(pick '.tags')" ;;
+    */boards)     demo_out "$(pick '.boards')" ;;
+    */boards/*/columns)
+      board="${DEMO_BARE#*/boards/}"; board="${board%/columns}"
+      demo_out "$(pick --arg b "$board" '.columns[$b] // []' 2>/dev/null || pick '.columns["demo-board-1"] // []')" ;;
+    */cards)
+      board="${DEMO_BOARD:-demo-board-1}"
+      case "$DEMO_QUERY" in
+        *indexed_by=not_now*) demo_out "$(jq -c --arg b "$board" '.not_now[$b] // []' "$FIXTURES")" ;;
+        *indexed_by=closed*)  demo_out "$(jq -c --arg b "$board" '.closed[$b] // []' "$FIXTURES")" ;;
+        *)                    demo_out "$(jq -c --arg b "$board" '.cards[$b] // []' "$FIXTURES")" ;;
+      esac ;;
+    */cards/*/comments)
+      n="${DEMO_BARE#*/cards/}"; n="${n%/comments}"
+      demo_comments "$(jq -c --arg n "$n" '.comments[$n] // []' "$FIXTURES")" ;;
+    */cards/*)
+      n="${DEMO_BARE##*/cards/}"
+      demo_out "$(jq -c --arg n "$n" '.details[$n] // {}' "$FIXTURES")" ;;
+    *) echo "fizzy-fetch: --demo has no fixture for $DEMO_PATH" >&2; exit 1 ;;
+  esac
+  exit 0
+fi
+
+if [[ "$AVATARS" == "1" ]]; then
+  METHOD="GET"
+  API_PATH="/{slug}/users"
+  BODY=""
+  PAGINATE=1
+else
+  METHOD="${1:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+  API_PATH="${2:?usage: fizzy-fetch METHOD API_PATH [JSON_BODY]}"
+  BODY="${3:-}"
+fi
 
 case "$METHOD" in
   GET|POST|PUT|DELETE) ;;
@@ -48,7 +147,25 @@ TOKEN=$(jq -r '.token // empty' "$CONFIG" 2>/dev/null) \
 SLUG=$(jq -r '.account_slug // empty' "$CONFIG" 2>/dev/null || true)
 BASE=$(jq -r '.base_url // empty' "$CONFIG" 2>/dev/null || true)
 BASE="${BASE:-https://app.fizzy.do}"
-BASE="${BASE%/}"
+
+# base_url is user-typed (the connect screen, or this file edited by hand), so
+# a bare host is the likely paste: https for a real one, http for a loopback
+# dev instance, which does not speak TLS. Anything that isn't http(s) is a
+# mistake worth naming rather than handing to curl. Keep this rule in step
+# with normalizeBaseUrl in Model.js.
+case "$BASE" in
+  http://*|https://*) ;;
+  *://*) echo "fizzy-fetch: base_url must be http:// or https:// (got $BASE)" >&2; exit 3 ;;
+  localhost|localhost:*|localhost/*|127.*|\[::1\]|\[::1\]:*) BASE="http://$BASE" ;;
+  *) BASE="https://$BASE" ;;
+esac
+while [[ "$BASE" == */ ]]; do BASE="${BASE%/}"; done
+
+# Link headers give paths from the site root, so a relative rel="next" has to
+# resolve against the origin — not against an instance served under a prefix.
+SCHEME="${BASE%%://*}"
+HOST_AND_PATH="${BASE#*://}"
+ORIGIN="$SCHEME://${HOST_AND_PATH%%/*}/"
 
 [[ -n "$TOKEN" ]] || { echo "fizzy-fetch: no token configured" >&2; exit 3; }
 
@@ -97,13 +214,53 @@ next_link() { # reads the last response's headers, prints rel=next url or nothin
 
 URL="$BASE$API_PATH"
 
-if [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
+# Which people have a real picture. One HEAD each, eight at a time: the answer
+# is stable for a session, so this runs once and the panel keeps the map.
+resolve_avatars() {
+  local users="$1" work id url type inflight=0
+  work=$(mktemp -d)
+  trap 'rm -rf "$work"' RETURN
+
+  while IFS=$'\t' read -r id url; do
+    [[ -n "$id" && -n "$url" ]] || continue
+    (
+      # The value is the avatar endpoint, not the storage URL it redirects to:
+      # that one is signed and expires, and Qt follows the redirect itself, so
+      # keeping the stable address means the picture never goes stale.
+      type=$(curl -sIL -o /dev/null --max-time 10 --config "$CURL_CFG" \
+        -w '%{content_type}' "$url" 2>/dev/null) || exit 0
+      case "$type" in
+        image/svg*) exit 0 ;;                      # server-drawn initials
+        image/*) printf '%s\t%s\n' "$id" "$url" > "$work/${id//[^A-Za-z0-9_-]/_}" ;;
+      esac
+    ) &
+    inflight=$((inflight + 1))
+    (( inflight % 8 == 0 )) && wait
+  done < <(printf '%s' "$users" | jq -r '.[]? | select(.avatar_url) | "\(.id)\t\(.avatar_url)"')
+  wait
+
+  cat "$work"/* 2>/dev/null | jq -R -s '
+    split("\n") | map(select(length > 0) | split("\t"))
+    | map({ key: .[0], value: .[1] }) | from_entries'
+}
+
+if [[ "$AVATARS" == "1" ]]; then
   PAGES=()
   for _ in 1 2 3 4 5; do
     PAGES+=("$(fetch_url "$URL")")
     URL=$(next_link)
     [[ -n "$URL" ]] || break
-    [[ "$URL" == http* ]] || URL="$BASE$URL"
+    [[ "$URL" == http* ]] || URL="$ORIGIN${URL#/}"
+  done
+  resolve_avatars "$(printf '%s\n' "${PAGES[@]}" \
+    | jq -s 'map(if type == "array" then . else [] end) | add')"
+elif [[ "$PAGINATE" == "1" && "$METHOD" == "GET" ]]; then
+  PAGES=()
+  for _ in 1 2 3 4 5; do
+    PAGES+=("$(fetch_url "$URL")")
+    URL=$(next_link)
+    [[ -n "$URL" ]] || break
+    [[ "$URL" == http* ]] || URL="$ORIGIN${URL#/}"
   done
   # List endpoints return top-level JSON arrays; merge them.
   printf '%s\n' "${PAGES[@]}" | jq -s 'map(if type == "array" then . else [] end) | add'

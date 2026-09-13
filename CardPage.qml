@@ -450,25 +450,20 @@ Item {
             width: body.width
             spacing: Style.space(9)
 
-            Rectangle {
-              width: Style.space(20)
-              height: width
-              radius: width / 2
-              color: Util.alpha(
-                Model.avatarColor(commentRow.modelData.creator ? commentRow.modelData.creator.name : "", panel.lightTheme),
-                0.35)
-
-              Text {
-                anchors.centerIn: parent
-                text: Model.initials(commentRow.modelData.creator ? commentRow.modelData.creator.name : "")
-                color: panel.ink
-                font.family: panel.fontFamily
-                font.pixelSize: Math.round(Style.font.caption * 0.85)
-              }
+            Avatar {
+              id: commentSeat
+              user: commentRow.modelData.creator
+              photoUrl: root.panel.avatarUrlFor(commentRow.modelData.creator)
+              panel: root.panel
+              size: Style.space(24)
+              initialsScale: 0.44
             }
 
             Column {
-              width: parent.width - Style.space(29)
+              // Derived, not a hand-added constant: the seat and the gap are
+              // both scaled tokens, so a hard number goes wrong on any theme
+              // that isn't 1.0.
+              width: parent.width - commentSeat.width - commentRow.spacing
               spacing: Style.space(2)
 
               Row {
